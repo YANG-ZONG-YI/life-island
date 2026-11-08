@@ -1,9 +1,11 @@
 /**
  * Life Island 核心資料事實來源 (SSOT)
- * 包含 8 大核心島嶼定義與開發島專屬之時間軸日誌導出
+ * 包含 8 大核心島嶼定義、跨島協作關係與搜尋導出
  */
 
 export { devLogs } from './dataLogs.js';
+export { synergyConnections } from './dataSynergy.js';
+export { searchIslands, filterIslands } from './engine/searchEngine.js';
 
 export const islands = [
   {
@@ -145,7 +147,7 @@ export const islands = [
       {
         id: "wlth-1",
         title: "全天候資產配置策略 (All-Weather)",
-        desc: "股票指數、通膨避險資產與無風險流動性儲備之反脆弱組合。",
+        desc: "建立穩健的三層資產配置金字塔，涵蓋股票指數、避險資產與無風險流動儲備。",
         status: "ACTIVE"
       },
       {
@@ -182,7 +184,7 @@ export const islands = [
     ]
   },
   {
-    id: "adventure-joy",
+    id: "adventures-joy",
     name: "探索與冒險之島",
     subtitle: "Adventures & Joy",
     biome: "Sunset Archipelago",

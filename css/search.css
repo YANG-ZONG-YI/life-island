@@ -1,0 +1,156 @@
+/* 頂部搜尋列與協作線控制樣式 */
+.search-box-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  padding: 9px 34px 9px 36px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 500;
+  width: 220px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.search-input:focus {
+  width: 280px;
+  border-color: var(--primary);
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 13px;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: none;
+  padding: 4px;
+}
+
+.search-clear-btn:hover {
+  color: #fff;
+}
+
+/* 搜尋即時下拉建議列表 */
+.search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 320px;
+  max-height: 360px;
+  overflow-y: auto;
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  padding: 8px 0;
+  display: none;
+  z-index: 100;
+}
+
+.search-dropdown.visible {
+  display: block;
+}
+
+.search-result-group {
+  padding: 4px 0;
+}
+
+.search-group-header {
+  padding: 6px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+  letter-spacing: 0.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-result-item {
+  padding: 8px 14px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  transition: background 0.15s ease;
+}
+
+.search-result-item:hover, .search-result-item.active {
+  background: rgba(56, 189, 248, 0.15);
+}
+
+.search-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+.search-item-snippet {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.search-empty {
+  padding: 16px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* 協作按鈕 Active 態 */
+.nav-btn.active-toggle {
+  background: rgba(56, 189, 248, 0.2);
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+}
+
+/* 高光文字與卡片 */
+mark.search-highlight {
+  background: rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+  font-weight: 700;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.milestone-card.highlighted-card,
+.policy-card.highlighted-card,
+.timeline-item.highlighted-card {
+  border-color: var(--accent-gold);
+  background: rgba(245, 158, 11, 0.08);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.2);
+}
+

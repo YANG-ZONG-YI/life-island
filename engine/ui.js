@@ -2,7 +2,16 @@
  * 2D 玻璃擬態 UI 控制器 (HUD & Glassmorphism Drawer)
  */
 
-export function createUIController({ islands, devLogs, onIslandSelect, onResetView, onThemeToggle }) {
+import { createSearchUI, highlightKeyword } from './uiSearch.js';
+
+export function createUIController({
+  islands,
+  devLogs,
+  onIslandSelect,
+  onResetView,
+  onThemeToggle,
+  onSynergyToggle
+}) {
   const drawerEl = document.getElementById('island-drawer');
   const drawerContentEl = document.getElementById('drawer-content');
   const closeBtn = document.getElementById('drawer-close-btn');
@@ -10,8 +19,10 @@ export function createUIController({ islands, devLogs, onIslandSelect, onResetVi
   const islandSelectEl = document.getElementById('island-select');
   const resetBtn = document.getElementById('btn-reset-view');
   const themeToggleBtn = document.getElementById('btn-theme-toggle');
+  const synergyToggleBtn = document.getElementById('btn-synergy-toggle');
 
   let currentSelectedIslandId = null;
+  let activeSearchKeyword = '';
 
   // 1. 初始化下拉選單
   if (islandSelectEl) {
@@ -36,6 +47,7 @@ export function createUIController({ islands, devLogs, onIslandSelect, onResetVi
     resetBtn.addEventListener('click', () => {
       closeDrawer();
       if (islandSelectEl) islandSelectEl.value = '';
+      searchUI.clearSearch(false);
       onResetView();
     });
   }
@@ -48,22 +60,44 @@ export function createUIController({ islands, devLogs, onIslandSelect, onResetVi
     });
   }
 
+  // 3. 協作線切換開關
+  if (synergyToggleBtn) {
+    synergyToggleBtn.addEventListener('click', () => {
+      const isActive = synergyToggleBtn.classList.toggle('active-toggle');
+      if (onSynergyToggle) onSynergyToggle(isActive);
+    });
+  }
+
   if (closeBtn) {
     closeBtn.addEventListener('click', closeDrawer);
   }
 
+  // 4. 搜尋 UI 模組接入
+  const searchUI = createSearchUI({
+    onSelectIsland: (islandId, keyword) => {
+      activeSearchKeyword = keyword;
+      onIslandSelect(islandId, keyword);
+    },
+    onClearSearch: () => {
+      activeSearchKeyword = '';
+      onResetView();
+    }
+  });
+
   /**
    * 開啟抽屜並根據島嶼類型動態渲染
    * @param {object} island
+   * @param {string} keyword
    */
-  function openDrawer(island) {
+  function openDrawer(island, keyword = '') {
     currentSelectedIslandId = island.id;
+    activeSearchKeyword = keyword;
     if (islandSelectEl) islandSelectEl.value = island.id;
 
     if (island.id === 'dev-island') {
-      renderDevIslandDrawer(island);
+      renderDevIslandDrawer(island, keyword);
     } else {
-      renderStandardIslandDrawer(island);
+      renderStandardIslandDrawer(island, keyword);
     }
 
     drawerEl.classList.add('open');
@@ -77,7 +111,9 @@ export function createUIController({ islands, devLogs, onIslandSelect, onResetVi
   /**
    * 渲染開發島專屬的垂直時間軸視圖 (Timeline View)
    */
-  function renderDevIslandDrawer(island) {
+  function renderDevIslandDrawer(island, keyword) {
+    const kw = (keyword || '').toLowerCase();
+
     const timelineHtml = devLogs.map(log => {
       const isMajor = log.type === 'MAJOR' || log.isMajor === true;
       const typeBadge = isMajor
@@ -86,37 +122,50 @@ export function createUIController({ islands, devLogs, onIslandSelect, onResetVi
       
       const statusBadge = `<span class="badge-status status-${log.status.toLowerCase()}">${log.status}</span>`;
 
+      const isMatched = kw && (
+        log.title?.toLowerCase().includes(kw) ||
+        log.summary?.toLowerCase().includes(kw) ||
+        (Array.isArray(log.details) && log.details.some(d => d.toLowerCase().includes(kw)))
+      );
+
       const detailsList = Array.isArray(log.details)
-        ? `<ul class="timeline-details">${log.details.map(d => `<li>${d}</li>`).join('')}</ul>`
+        ? `<ul class="timeline-details">${log.details.map(d => `<li>${highlightKeyword(d, kw)}</li>`).join('')}</ul>`
         : '';
 
       return `
-        <div class="timeline-item ${isMajor ? 'timeline-item-major' : ''}">
+        <div class="timeline-item ${isMajor ? 'timeline-item-major' : ''} ${isMatched ? 'highlighted-card' : ''}">
           <div class="timeline-dot"></div>
           <div class="timeline-header">
             <span class="timeline-date">${log.date}</span>
             <div class="timeline-badges">${typeBadge} ${statusBadge}</div>
           </div>
-          <h4 class="timeline-title">${log.title}</h4>
-          <p class="timeline-summary">${log.summary}</p>
+          <h4 class="timeline-title">${highlightKeyword(log.title, kw)}</h4>
+          <p class="timeline-summary">${highlightKeyword(log.summary, kw)}</p>
           ${detailsList}
         </div>
       `;
     }).join('');
 
-    const corePoliciesHtml = island.items.map(item => `
-      <div class="policy-card">
-        <h5 class="policy-title">${item.title}</h5>
-        <p class="policy-desc">${item.desc}</p>
-      </div>
-    `).join('');
+    const corePoliciesHtml = island.items.map(item => {
+      const isMatched = kw && (
+        item.title?.toLowerCase().includes(kw) ||
+        item.desc?.toLowerCase().includes(kw)
+      );
+
+      return `
+        <div class="policy-card ${isMatched ? 'highlighted-card' : ''}">
+          <h5 class="policy-title">${highlightKeyword(item.title, kw)}</h5>
+          <p class="policy-desc">${highlightKeyword(item.desc, kw)}</p>
+        </div>
+      `;
+    }).join('');
 
     drawerContentEl.innerHTML = `
       <div class="island-header" style="border-left: 4px solid ${island.accentColor}">
-        <span class="island-biome">${island.biome}</span>
-        <h2 class="island-title">${island.name}</h2>
-        <h3 class="island-subtitle">${island.subtitle}</h3>
-        <p class="island-desc">${island.description}</p>
+        <span class="island-biome">${highlightKeyword(island.biome, kw)}</span>
+        <h2 class="island-title">${highlightKeyword(island.name, kw)}</h2>
+        <h3 class="island-subtitle">${highlightKeyword(island.subtitle, kw)}</h3>
+        <p class="island-desc">${highlightKeyword(island.description, kw)}</p>
       </div>
 
       <div class="section-container">
@@ -134,24 +183,33 @@ export function createUIController({ islands, devLogs, onIslandSelect, onResetVi
   /**
    * 渲染常規島嶼的內容條目視圖
    */
-  function renderStandardIslandDrawer(island) {
+  function renderStandardIslandDrawer(island, keyword) {
+    const kw = (keyword || '').toLowerCase();
     const items = island.items || island.policies || [];
-    const itemsHtml = items.map(item => `
-      <div class="milestone-card">
-        <div class="milestone-header">
-          <h4 class="milestone-title">${item.title}</h4>
-          ${item.status ? `<span class="badge badge-neutral">${item.status}</span>` : ''}
+
+    const itemsHtml = items.map(item => {
+      const isMatched = kw && (
+        item.title?.toLowerCase().includes(kw) ||
+        (item.desc || item.description || '')?.toLowerCase().includes(kw)
+      );
+
+      return `
+        <div class="milestone-card ${isMatched ? 'highlighted-card' : ''}">
+          <div class="milestone-header">
+            <h4 class="milestone-title">${highlightKeyword(item.title, kw)}</h4>
+            ${item.status ? `<span class="badge badge-neutral">${item.status}</span>` : ''}
+          </div>
+          <p class="milestone-desc">${highlightKeyword(item.desc || item.description || '', kw)}</p>
         </div>
-        <p class="milestone-desc">${item.desc || item.description || ''}</p>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     drawerContentEl.innerHTML = `
       <div class="island-header" style="border-left: 4px solid ${island.accentColor}">
-        <span class="island-biome">${island.biome}</span>
-        <h2 class="island-title">${island.name}</h2>
-        <h3 class="island-subtitle">${island.subtitle}</h3>
-        <p class="island-desc">${island.description}</p>
+        <span class="island-biome">${highlightKeyword(island.biome, kw)}</span>
+        <h2 class="island-title">${highlightKeyword(island.name, kw)}</h2>
+        <h3 class="island-subtitle">${highlightKeyword(island.subtitle, kw)}</h3>
+        <p class="island-desc">${highlightKeyword(island.description, kw)}</p>
       </div>
 
       <div class="section-container">
@@ -163,9 +221,6 @@ export function createUIController({ islands, devLogs, onIslandSelect, onResetVi
 
   /**
    * 更新滑鼠懸停微縮提示卡
-   * @param {object|null} island
-   * @param {number} clientX
-   * @param {number} clientY
    */
   function updateTooltip(island, clientX, clientY) {
     if (!hoverTooltipEl) return;
@@ -187,7 +242,7 @@ export function createUIController({ islands, devLogs, onIslandSelect, onResetVi
     openDrawer,
     closeDrawer,
     updateTooltip,
+    clearSearch: () => searchUI.clearSearch(true),
     getCurrentIslandId: () => currentSelectedIslandId
   };
 }
-

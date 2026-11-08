@@ -1,6 +1,7 @@
 {
   "name": "life-island",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "description": "Life Island 3D interactive personal blueprint",
   "scripts": {

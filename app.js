@@ -1,15 +1,16 @@
 import * as THREE from 'three';
-import { islands, devLogs } from './data.js';
+import { islands, devLogs, synergyConnections } from './data.js';
 import { createIslandMesh } from './engine/hexGrid.js';
 import { addIslandDecorations } from './engine/decorations.js';
 import { createWaterPlane } from './engine/water.js';
 import { createCameraController } from './engine/camera.js';
 import { createUIController } from './engine/ui.js';
+import { createSynergyLines } from './engine/synergyLines.js';
+import { createSpotlightController } from './engine/spotlight.js';
 
 /**
  * Life Island 3D 主程序入口
  */
-
 class LifeIslandApp {
   constructor() {
     this.container = document.getElementById('canvas-container');
@@ -25,6 +26,7 @@ class LifeIslandApp {
     this.initLights();
     this.initWater();
     this.initIslands();
+    this.initSynergyAndSpotlight();
     this.initCameraAndUI();
     this.initEvents();
 
@@ -37,12 +39,7 @@ class LifeIslandApp {
     this.scene.background = new THREE.Color(0x0f172a);
     this.scene.fog = new THREE.FogExp2(0x0f172a, 0.016);
 
-    this.camera = new THREE.PerspectiveCamera(
-      45,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      200
-    );
+    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);
     this.camera.position.set(0, 18, 24);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -52,7 +49,6 @@ class LifeIslandApp {
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.15;
-
     this.container.appendChild(this.renderer.domElement);
   }
 
@@ -63,8 +59,7 @@ class LifeIslandApp {
     this.sunLight = new THREE.DirectionalLight(0xfffbeb, 1.4);
     this.sunLight.position.set(20, 30, 15);
     this.sunLight.castShadow = true;
-    this.sunLight.shadow.mapSize.width = 2048;
-    this.sunLight.shadow.mapSize.height = 2048;
+    this.sunLight.shadow.mapSize.set(2048, 2048);
     this.sunLight.shadow.camera.near = 0.5;
     this.sunLight.shadow.camera.far = 100;
     this.sunLight.shadow.camera.left = -25;
@@ -92,7 +87,7 @@ class LifeIslandApp {
       addIslandDecorations(islandGroup, islandData);
 
       this.islandsRoot.add(islandGroup);
-      this.islandsMap.set(islandData.id, { data: islandData, group: islandGroup, originalY: 0 });
+      this.islandsMap.set(islandData.id, { data: islandData, group: islandGroup });
 
       islandGroup.traverse((child) => {
         if (child.isMesh && child.userData.isClickable) {
@@ -102,24 +97,35 @@ class LifeIslandApp {
     }
   }
 
+  initSynergyAndSpotlight() {
+    this.synergyLines = createSynergyLines(this.scene, this.islandsMap, synergyConnections);
+    this.spotlightController = createSpotlightController(this.scene);
+  }
+
   initCameraAndUI() {
     this.cameraController = createCameraController(this.camera, this.renderer.domElement);
-
     this.uiController = createUIController({
       islands,
       devLogs,
-      onIslandSelect: (islandId) => this.focusIslandById(islandId),
-      onResetView: () => this.cameraController.reset(),
-      onThemeToggle: (isNight) => this.applyTheme(isNight)
+      onIslandSelect: (islandId, kw) => this.focusIslandById(islandId, kw),
+      onResetView: () => this.handleResetView(),
+      onThemeToggle: (isNight) => this.applyTheme(isNight),
+      onSynergyToggle: (visible) => this.synergyLines.setVisible(visible)
     });
   }
 
-  focusIslandById(islandId) {
+  focusIslandById(islandId, keyword = '') {
     const entry = this.islandsMap.get(islandId);
     if (!entry) return;
 
     this.cameraController.flyTo(entry.group.position);
-    this.uiController.openDrawer(entry.data);
+    this.spotlightController.focusIsland(islandId, this.islandsMap);
+    this.uiController.openDrawer(entry.data, keyword);
+  }
+
+  handleResetView() {
+    this.spotlightController.clearFocus(this.islandsMap);
+    this.cameraController.reset();
   }
 
   applyTheme(isNight) {
@@ -171,16 +177,14 @@ class LifeIslandApp {
       if (entry && this.hoveredIslandGroup !== entry.group) {
         this.resetHoverState();
         this.hoveredIslandGroup = entry.group;
-        entry.group.position.y = 0.45; // 浮起回饋
+        entry.group.position.y = 0.45;
         document.body.style.cursor = 'pointer';
         this.uiController.updateTooltip(entry.data, clientX, clientY);
       } else if (entry) {
         this.uiController.updateTooltip(entry.data, clientX, clientY);
       }
     } else {
-      if (this.hoveredIslandGroup) {
-        this.resetHoverState();
-      }
+      if (this.hoveredIslandGroup) this.resetHoverState();
       this.uiController.updateTooltip(null, 0, 0);
       document.body.style.cursor = 'default';
     }
@@ -196,32 +200,26 @@ class LifeIslandApp {
   handlePointerClick() {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersects = this.raycaster.intersectObjects(this.clickableMeshes);
-
     if (intersects.length > 0) {
-      const hitMesh = intersects[0].object;
-      const islandId = hitMesh.userData.islandId;
+      const islandId = intersects[0].object.userData.islandId;
       this.focusIslandById(islandId);
     }
   }
 
   animate() {
     requestAnimationFrame(this.animate);
+    const delta = this.clock.getDelta();
     const elapsedTime = this.clock.getElapsedTime();
 
-    if (this.water) {
-      this.water.update(elapsedTime);
-    }
-
-    if (this.cameraController) {
-      this.cameraController.update();
-    }
+    if (this.water) this.water.update(elapsedTime);
+    if (this.synergyLines) this.synergyLines.update(delta);
+    if (this.spotlightController) this.spotlightController.update(delta);
+    if (this.cameraController) this.cameraController.update();
 
     this.renderer.render(this.scene, this.camera);
   }
 }
 
-// 啟動應用
 window.addEventListener('DOMContentLoaded', () => {
   new LifeIslandApp();
 });
-

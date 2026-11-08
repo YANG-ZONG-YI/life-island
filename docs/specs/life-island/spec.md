@@ -128,3 +128,30 @@ interface DevLogEntity {
 - **[PROBE: HTTP_STATUS]**：發送 `GET /` 請求 MUST 回傳 `HTTP 200 OK`，且回應標頭 `Content-Type` 必須為 `text/html`。
 - **[PROBE: STATIC_ASSETS]**：應用核心檔案 (`/app.js`、`/data.js`、`/dataLogs.js`、`/style.css`、`/engine/*.js`) 存取 MUST 回傳 `HTTP 200 OK`。
 - **[PROBE: CLIENT_RENDERING]**：零伺服器運算契約。三維網格計算、動態 Shader 渲染與射線拾取 100% 於客戶端瀏覽器執行。
+
+---
+
+## 6. 跨島協作光流線與 3D 聚光搜尋規範 (Synergy & Search Specification)
+
+### 6.1 協作網絡契約 (Synergy Connection Schema)
+```typescript
+interface SynergyConnection {
+  from: string;      // 來源島嶼 ID (MUST 為合法 8 大島嶼之一)
+  to: string;        // 目標島嶼 ID (MUST 不等於 from)
+  label: string;     // 關聯語意說明
+  strength: number;  // 關聯強度 [0.1, 1.0]
+}
+```
+- 系統 MUST 包含至少 6 條以上有效跨島連線。
+- 幾何呈現：以 `CubicBezierCurve3` 在三維空間中拉出拱形空中光弧，頂點由兩島中心向空中抬升 $(y + 3.0 \sim 4.5)$。
+- 流光動畫：透過 `LineDashedMaterial.dashOffset` 於渲染迴圈中動態更新，呈現能量流動感。
+
+### 6.2 3D 聚光燈聚焦機制 (Spotlight Focus Dynamics)
+- 聚光幾何：半透明圓柱體錐光 (Volumetric Cylinder Mesh) 搭配地面光環。
+- 焦點聚焦時，非目標島嶼之透明度/亮度降低至 42% (Focus Dimming)，目標島嶼光柱垂直升起；清除焦點時精確恢復 100% 原狀。
+
+### 6.3 模糊檢索核心 (Search Engine Precision)
+- 搜尋範圍涵蓋島嶼名稱、副標題、政策/里程碑標題與內文詳細步驟、以及開發日誌。
+- 檢索演算法回傳格式：`Array<{ islandId: string, islandName: string, matchedItems: Array<{ title: string, type: string }> }>`。
+- 響應時間 MUST < 50ms。
+

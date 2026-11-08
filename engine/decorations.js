@@ -44,6 +44,7 @@ export function addIslandDecorations(islandGroup, islandData) {
       buildConnectionsLandmark(decorGroup, baseTop);
       break;
     case 'adventure-joy':
+    case 'adventures-joy':
       buildAdventureLandmark(decorGroup, baseTop);
       break;
     default:

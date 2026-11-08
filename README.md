@@ -3,6 +3,7 @@
 > 致敬卡坦島風格（Catan Low-Poly 3D）與政策島互動微縮地圖設計理念之個人生涯願景、技術演進與重大規劃視覺化平台。
 
 ---
+https://yang-zong-yi.github.io/life-island/
 
 ## 1. 重大開發規格 (Major Development Specifications)
 

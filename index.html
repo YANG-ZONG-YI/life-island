@@ -28,6 +28,24 @@
     </div>
 
     <div class="nav-actions">
+      <!-- 3D 關鍵字聚光燈搜尋輸入框 -->
+      <div class="search-box-wrapper">
+        <span class="search-icon">🔍</span>
+        <input
+          type="text"
+          id="search-input"
+          class="search-input"
+          placeholder="搜尋島嶼、條目、日誌..."
+          autocomplete="off"
+          aria-label="搜尋關鍵字"
+        />
+        <button id="search-clear-btn" class="search-clear-btn" title="清除搜尋">&times;</button>
+        <div id="search-dropdown" class="search-dropdown" role="listbox"></div>
+      </div>
+
+      <!-- 跨島協作光流開關 -->
+      <button id="btn-synergy-toggle" class="nav-btn active-toggle" title="切換協作光流線">⚡ 協作光流</button>
+
       <select id="island-select" class="nav-select" aria-label="選擇島嶼">
         <option value="">載入中...</option>
       </select>
