@@ -30,6 +30,13 @@ class LifeIslandApp {
     this.initCameraAndUI();
     this.initEvents();
 
+    // 啟動 800ms 後自動開啟核心島嶼抽屜，確保使用者進入即看到豐富內容
+    setTimeout(() => {
+      if (this.uiController && !this.uiController.getCurrentIslandId()) {
+        this.focusIslandById('dev-island');
+      }
+    }, 800);
+
     this.animate = this.animate.bind(this);
     requestAnimationFrame(this.animate);
   }
@@ -42,13 +49,11 @@ class LifeIslandApp {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);
     this.camera.position.set(0, 18, 24);
 
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.15;
     this.container.appendChild(this.renderer.domElement);
   }
 
@@ -62,10 +67,11 @@ class LifeIslandApp {
     this.sunLight.shadow.mapSize.set(2048, 2048);
     this.sunLight.shadow.camera.near = 0.5;
     this.sunLight.shadow.camera.far = 100;
-    this.sunLight.shadow.camera.left = -25;
-    this.sunLight.shadow.camera.right = 25;
-    this.sunLight.shadow.camera.top = 25;
-    this.sunLight.shadow.camera.bottom = -25;
+    const d = 25;
+    this.sunLight.shadow.camera.left = -d;
+    this.sunLight.shadow.camera.right = d;
+    this.sunLight.shadow.camera.top = d;
+    this.sunLight.shadow.camera.bottom = -d;
     this.sunLight.shadow.bias = -0.0005;
     this.scene.add(this.sunLight);
 
@@ -90,7 +96,9 @@ class LifeIslandApp {
       this.islandsMap.set(islandData.id, { data: islandData, group: islandGroup });
 
       islandGroup.traverse((child) => {
-        if (child.isMesh && child.userData.isClickable) {
+        if (child.isMesh) {
+          child.userData.islandId = islandData.id;
+          child.userData.isClickable = true;
           this.clickableMeshes.push(child);
         }
       });
@@ -129,21 +137,13 @@ class LifeIslandApp {
   }
 
   applyTheme(isNight) {
-    if (isNight) {
-      this.scene.background.set(0x020617);
-      this.scene.fog.color.set(0x020617);
-      this.ambientLight.intensity = 0.35;
-      this.sunLight.intensity = 0.5;
-      this.sunLight.color.set(0x818cf8);
-      this.water.material.color.set(0x02172d);
-    } else {
-      this.scene.background.set(0x0f172a);
-      this.scene.fog.color.set(0x0f172a);
-      this.ambientLight.intensity = 0.75;
-      this.sunLight.intensity = 1.4;
-      this.sunLight.color.set(0xfffbeb);
-      this.water.material.color.set(0x0369a1);
-    }
+    const bg = isNight ? 0x020617 : 0x0f172a;
+    this.scene.background.set(bg);
+    this.scene.fog.color.set(bg);
+    this.ambientLight.intensity = isNight ? 0.35 : 0.75;
+    this.sunLight.intensity = isNight ? 0.5 : 1.4;
+    this.sunLight.color.set(isNight ? 0x818cf8 : 0xfffbeb);
+    this.water.material.color.set(isNight ? 0x02172d : 0x0369a1);
   }
 
   initEvents() {
@@ -161,8 +161,20 @@ class LifeIslandApp {
 
     window.addEventListener('click', (e) => {
       if (e.target.closest('#island-drawer') || e.target.closest('#hud-nav')) return;
+      this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
       this.handlePointerClick();
     });
+
+    window.addEventListener('touchend', (e) => {
+      if (e.target.closest('#island-drawer') || e.target.closest('#hud-nav')) return;
+      if (e.changedTouches && e.changedTouches[0]) {
+        const touch = e.changedTouches[0];
+        this.mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
+        this.mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
+        this.handlePointerClick();
+      }
+    }, { passive: true });
   }
 
   handlePointerHover(clientX, clientY) {
@@ -199,11 +211,8 @@ class LifeIslandApp {
 
   handlePointerClick() {
     this.raycaster.setFromCamera(this.mouse, this.camera);
-    const intersects = this.raycaster.intersectObjects(this.clickableMeshes);
-    if (intersects.length > 0) {
-      const islandId = intersects[0].object.userData.islandId;
-      this.focusIslandById(islandId);
-    }
+    const hits = this.raycaster.intersectObjects(this.clickableMeshes);
+    if (hits.length > 0) this.focusIslandById(hits[0].object.userData.islandId);
   }
 
   animate() {
@@ -220,6 +229,12 @@ class LifeIslandApp {
   }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+function initApp() {
   new LifeIslandApp();
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
