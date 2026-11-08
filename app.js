@@ -1,0 +1,227 @@
+import * as THREE from 'three';
+import { islands, devLogs } from './data.js';
+import { createIslandMesh } from './engine/hexGrid.js';
+import { addIslandDecorations } from './engine/decorations.js';
+import { createWaterPlane } from './engine/water.js';
+import { createCameraController } from './engine/camera.js';
+import { createUIController } from './engine/ui.js';
+
+/**
+ * Life Island 3D 主程序入口
+ */
+
+class LifeIslandApp {
+  constructor() {
+    this.container = document.getElementById('canvas-container');
+    this.islandsMap = new Map();
+    this.clickableMeshes = [];
+    this.hoveredIslandGroup = null;
+
+    this.clock = new THREE.Clock();
+    this.raycaster = new THREE.Raycaster();
+    this.mouse = new THREE.Vector2(-999, -999);
+
+    this.initScene();
+    this.initLights();
+    this.initWater();
+    this.initIslands();
+    this.initCameraAndUI();
+    this.initEvents();
+
+    this.animate = this.animate.bind(this);
+    requestAnimationFrame(this.animate);
+  }
+
+  initScene() {
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0x0f172a);
+    this.scene.fog = new THREE.FogExp2(0x0f172a, 0.016);
+
+    this.camera = new THREE.PerspectiveCamera(
+      45,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      200
+    );
+    this.camera.position.set(0, 18, 24);
+
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    this.renderer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.15;
+
+    this.container.appendChild(this.renderer.domElement);
+  }
+
+  initLights() {
+    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+    this.scene.add(this.ambientLight);
+
+    this.sunLight = new THREE.DirectionalLight(0xfffbeb, 1.4);
+    this.sunLight.position.set(20, 30, 15);
+    this.sunLight.castShadow = true;
+    this.sunLight.shadow.mapSize.width = 2048;
+    this.sunLight.shadow.mapSize.height = 2048;
+    this.sunLight.shadow.camera.near = 0.5;
+    this.sunLight.shadow.camera.far = 100;
+    this.sunLight.shadow.camera.left = -25;
+    this.sunLight.shadow.camera.right = 25;
+    this.sunLight.shadow.camera.top = 25;
+    this.sunLight.shadow.camera.bottom = -25;
+    this.sunLight.shadow.bias = -0.0005;
+    this.scene.add(this.sunLight);
+
+    this.hemiLight = new THREE.HemisphereLight(0x38bdf8, 0x0f172a, 0.5);
+    this.scene.add(this.hemiLight);
+  }
+
+  initWater() {
+    this.water = createWaterPlane(85, 48);
+    this.scene.add(this.water.mesh);
+  }
+
+  initIslands() {
+    this.islandsRoot = new THREE.Group();
+    this.scene.add(this.islandsRoot);
+
+    for (const islandData of islands) {
+      const islandGroup = createIslandMesh(islandData);
+      addIslandDecorations(islandGroup, islandData);
+
+      this.islandsRoot.add(islandGroup);
+      this.islandsMap.set(islandData.id, { data: islandData, group: islandGroup, originalY: 0 });
+
+      islandGroup.traverse((child) => {
+        if (child.isMesh && child.userData.isClickable) {
+          this.clickableMeshes.push(child);
+        }
+      });
+    }
+  }
+
+  initCameraAndUI() {
+    this.cameraController = createCameraController(this.camera, this.renderer.domElement);
+
+    this.uiController = createUIController({
+      islands,
+      devLogs,
+      onIslandSelect: (islandId) => this.focusIslandById(islandId),
+      onResetView: () => this.cameraController.reset(),
+      onThemeToggle: (isNight) => this.applyTheme(isNight)
+    });
+  }
+
+  focusIslandById(islandId) {
+    const entry = this.islandsMap.get(islandId);
+    if (!entry) return;
+
+    this.cameraController.flyTo(entry.group.position);
+    this.uiController.openDrawer(entry.data);
+  }
+
+  applyTheme(isNight) {
+    if (isNight) {
+      this.scene.background.set(0x020617);
+      this.scene.fog.color.set(0x020617);
+      this.ambientLight.intensity = 0.35;
+      this.sunLight.intensity = 0.5;
+      this.sunLight.color.set(0x818cf8);
+      this.water.material.color.set(0x02172d);
+    } else {
+      this.scene.background.set(0x0f172a);
+      this.scene.fog.color.set(0x0f172a);
+      this.ambientLight.intensity = 0.75;
+      this.sunLight.intensity = 1.4;
+      this.sunLight.color.set(0xfffbeb);
+      this.water.material.color.set(0x0369a1);
+    }
+  }
+
+  initEvents() {
+    window.addEventListener('resize', () => {
+      this.camera.aspect = window.innerWidth / window.innerHeight;
+      this.camera.updateProjectionMatrix();
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      this.handlePointerHover(e.clientX, e.clientY);
+    });
+
+    window.addEventListener('click', (e) => {
+      if (e.target.closest('#island-drawer') || e.target.closest('#hud-nav')) return;
+      this.handlePointerClick();
+    });
+  }
+
+  handlePointerHover(clientX, clientY) {
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const intersects = this.raycaster.intersectObjects(this.clickableMeshes);
+
+    if (intersects.length > 0) {
+      const hitMesh = intersects[0].object;
+      const islandId = hitMesh.userData.islandId;
+      const entry = this.islandsMap.get(islandId);
+
+      if (entry && this.hoveredIslandGroup !== entry.group) {
+        this.resetHoverState();
+        this.hoveredIslandGroup = entry.group;
+        entry.group.position.y = 0.45; // 浮起回饋
+        document.body.style.cursor = 'pointer';
+        this.uiController.updateTooltip(entry.data, clientX, clientY);
+      } else if (entry) {
+        this.uiController.updateTooltip(entry.data, clientX, clientY);
+      }
+    } else {
+      if (this.hoveredIslandGroup) {
+        this.resetHoverState();
+      }
+      this.uiController.updateTooltip(null, 0, 0);
+      document.body.style.cursor = 'default';
+    }
+  }
+
+  resetHoverState() {
+    if (this.hoveredIslandGroup) {
+      this.hoveredIslandGroup.position.y = 0;
+      this.hoveredIslandGroup = null;
+    }
+  }
+
+  handlePointerClick() {
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const intersects = this.raycaster.intersectObjects(this.clickableMeshes);
+
+    if (intersects.length > 0) {
+      const hitMesh = intersects[0].object;
+      const islandId = hitMesh.userData.islandId;
+      this.focusIslandById(islandId);
+    }
+  }
+
+  animate() {
+    requestAnimationFrame(this.animate);
+    const elapsedTime = this.clock.getElapsedTime();
+
+    if (this.water) {
+      this.water.update(elapsedTime);
+    }
+
+    if (this.cameraController) {
+      this.cameraController.update();
+    }
+
+    this.renderer.render(this.scene, this.camera);
+  }
+}
+
+// 啟動應用
+window.addEventListener('DOMContentLoaded', () => {
+  new LifeIslandApp();
+});
+

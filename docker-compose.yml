@@ -1,0 +1,18 @@
+services:
+  web:
+    image: nginx:alpine
+    container_name: life_island_web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+  tester:
+    image: node:20-alpine
+    container_name: life_island_tester
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    command: ["tail", "-f", "/dev/null"]
+

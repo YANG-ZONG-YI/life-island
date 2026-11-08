@@ -1,0 +1,140 @@
+/* 右側滑出抽屜 (Glassmorphism Drawer) */
+#island-drawer {
+  position: fixed;
+  top: 0;
+  right: -480px;
+  width: 440px;
+  height: 100vh;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-left: 1px solid var(--glass-border);
+  z-index: 30;
+  transition: right 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  box-shadow: -10px 0 35px rgba(0, 0, 0, 0.5);
+}
+
+#island-drawer.open {
+  right: 0;
+}
+
+.drawer-header-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 20px 8px;
+}
+
+.close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+#drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 24px 32px;
+}
+
+#drawer-content::-webkit-scrollbar {
+  width: 5px;
+}
+#drawer-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+/* 島嶼標頭 */
+.island-header {
+  padding: 8px 0 16px 14px;
+  margin-bottom: 20px;
+}
+
+.island-biome {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.island-title {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 4px 0 2px;
+  color: #fff;
+}
+
+.island-subtitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.island-desc {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #cbd5e1;
+}
+
+/* 區塊標題 */
+.section-container {
+  margin-top: 24px;
+}
+
+.section-title {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 6px;
+}
+
+/* 卡片 */
+.policy-card, .milestone-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 10px;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.policy-card:hover, .milestone-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.policy-title, .milestone-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 4px;
+}
+
+.policy-desc, .milestone-desc {
+  font-size: 12px;
+  line-height: 1.5;
+  color: #94a3b8;
+}
+

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Life Island 3D | 個人人生藍圖與作品集互動島</title>
+  <link rel="stylesheet" href="./style.css">
+
+  <!-- ES Module Importmap (Zero-Build Static Architecture) -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- 3D WebGL Canvas Container -->
+  <div id="canvas-container"></div>
+
+  <!-- 頂部 HUD 玻璃擬態導航列 -->
+  <header id="hud-nav">
+    <div class="brand-badge">
+      <span style="font-size: 16px;">🏝️</span>
+      <span class="brand-title">Life Island 3D</span>
+    </div>
+
+    <div class="nav-actions">
+      <select id="island-select" class="nav-select" aria-label="選擇島嶼">
+        <option value="">載入中...</option>
+      </select>
+      <button id="btn-reset-view" class="nav-btn" title="重置視角">🔄 全景</button>
+      <button id="btn-theme-toggle" class="nav-btn" title="切換日夜">☀️ 晨曦暖陽</button>
+    </div>
+  </header>
+
+  <!-- 滑鼠懸停微縮提示卡 -->
+  <div id="hover-tooltip" role="tooltip"></div>
+
+  <!-- 右側滑出抽屜 (Glassmorphism Drawer) -->
+  <aside id="island-drawer" aria-label="島嶼詳細內容">
+    <div class="drawer-header-bar">
+      <button id="drawer-close-btn" class="close-btn" aria-label="關閉抽屜">&times;</button>
+    </div>
+    <div id="drawer-content"></div>
+  </aside>
+
+  <!-- 應用主入口 -->
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
+
