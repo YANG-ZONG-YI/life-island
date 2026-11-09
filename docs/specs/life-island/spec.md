@@ -108,7 +108,7 @@ interface IslandEntity {
 
 ```typescript
 interface DevLogEntity {
-  id: string;                      // 日誌識別碼 (格式：log-YYYY-MM-DD)
+  id: number;                      // 唯一且遞增之正整數識別碼 (1, 2, 3...)
   date: string;                    // 格式：YYYY-MM-DD
   type: "MAJOR" | "ARCHITECTURE" | "FEATURE";
   title: string;                   // 日誌標題
@@ -121,10 +121,14 @@ interface DevLogEntity {
 ### 4.2 初始日誌基準清單
 
 | 日誌識別碼 (id) | 日期 (date) | 類型 (type) | 狀態 (status) | 標題 (title) |
-| :--- | :--- | :--- | :--- | :--- |
-| `log-2026-11-09` | `2026-11-09` | `[MAJOR]` | `[COMPLETED]` | Life Island 3D 零框架純靜態系統正式立項與架構確立 |
-| `log-2026-11-15` | `2026-11-15` | `[ARCHITECTURE]` | `[COMPLETED]` | 低多邊形水波 Shader 動態流光與視角跟隨演算法 |
-| `log-2026-12-01` | `2026-12-01` | `[MAJOR]` | `[PLANNED]` | 跨維度協作光流線 (Synergy Lines) 與動態天氣著色器計畫 |
+| :---: | :--- | :--- | :--- | :--- |
+| `1` | `2026-11-09` | `[MAJOR]` | `[COMPLETED]` | Life Island 3D 零框架純靜態系統正式立項與架構確立 |
+| `2` | `2026-11-09` | `[ARCHITECTURE]` | `[COMPLETED]` | 低多邊形水波 Shader 動態流光與視角跟隨演算法 |
+| `3` | `2026-11-09` | `[MAJOR]` | `[COMPLETED]` | 全平台現代化 RWD 響應式佈局與直屏 3D 相機自適應 |
+| `4` | `2026-11-09` | `[ARCHITECTURE]` | `[COMPLETED]` | Cloudflare Pages 邊緣雲與 GitHub 雙軌零構建秒開交付 |
+| `5` | `2026-11-09` | `[MAJOR]` | `[COMPLETED]` | 正七邊形極座標完美等距群島幾何重構 (方案 A) |
+| `6` | `2026-11-09` | `[MAJOR]` | `[COMPLETED]` | 探險小旅人自主隨機漫遊出沒模式 (方案 1) |
+| `7` | `2026-11-09` | `[MAJOR]` | `[PLANNED]` | 跨維度協作光流線 (Synergy Lines) 與動態天氣著色器計畫 |
 
 ---
 
@@ -184,6 +188,10 @@ interface SynergyConnection {
 ### 7.2 動態位移與巡航動力學 (Trajectory & State Dynamics)
 - **閒置呼吸**：閒置狀態下軀幹於 Y 軸執行正弦週期微浮動 ($\pm 0.02$ 單位)。
 - **島嶼巡航**：當目標島嶼切換時，旅人面向目標點，依循拋物線軌跡 (`lerpVectors` + 拱起弧度 $4.2 \times \sin(\pi \times progress)$) 躍動巡航，耗時固定為 $1.1$ 秒。
+- **自主漫遊出沒機制 (Autonomous Roaming)**：
+  - 閒置無操作滿 $14 \sim 22$ 秒（隨機冷卻）時，小旅人自主挑選另一座相異島嶼躍動跳躍巡航。
+  - 抵達目標島嶼後揮手致意，並以 $40\%$ 機率主動展示心法金句氣泡（停留 $4.5$ 秒後淡出）。
+  - 使用者手動選島操作享有絕對搶佔優先權 (Preemption Guard)，立即重置閒置計時器。
 - **抵達反饋**：降落目標島頂面後，自動觸發 2 週期的揮手致意動畫。
 
 ### 7.3 心法金句氣泡契約 (Wisdom Quotes Bubble)

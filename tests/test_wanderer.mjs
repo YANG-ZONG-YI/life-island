@@ -28,6 +28,15 @@ test('[WANDERER_ENGINE_SOURCE_INTEGRITY] engine/wanderer.js source code must dec
   assert.ok(code.includes('showQuoteBubble'), 'Must declare showQuoteBubble');
   assert.ok(code.includes('hideQuoteBubble'), 'Must declare hideQuoteBubble');
   assert.ok(code.includes('update'), 'Must declare update');
+  assert.ok(code.includes('setIslandsMap'), 'Must declare setIslandsMap for autonomous roaming');
+});
+
+test('[WANDERER_AUTONOMOUS_ROAMING_CONTRACT] wanderer engine must implement autonomous roaming timer and quote probabilities', () => {
+  const code = fs.readFileSync('./engine/wanderer.js', 'utf-8');
+
+  assert.ok(code.includes('triggerAutonomousRoam'), 'Must implement triggerAutonomousRoam');
+  assert.ok(code.includes('idleTimer'), 'Must maintain idleTimer for idle detection');
+  assert.ok(code.includes('isAutonomousRoam'), 'Must track autonomous roaming state');
 });
 
 test('[WANDERER_DOM_AND_STYLES_CONTRACT] index.html and style.css must declare wanderer bubble element and styles', () => {

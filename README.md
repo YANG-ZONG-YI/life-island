@@ -69,6 +69,7 @@
 ### [SPEC-09: THE_WANDERER_MASCOT] 探險小旅人與心法金句微縮互動
 - **低多邊形程序化角色**：純代碼構建之探險小人偶，隨島嶼切換以拋物線軌跡（Arc Height = 4.2）躍動巡航。
 - **互動心法金句氣泡**：點擊小旅人彈出世界座標 3D 投影之 Glassmorphism 氣泡，實裝螢幕安全邊界鉗位 (Screen Clamping) 防禦。
+- **自主漫遊出沒機制 (方案 1)**：在使用者無操作滿 14~22 秒時，小旅人自主挑選下一座島嶼躍動巡航出沒，落地揮手並以 40% 機率自動分享心法（4.5 秒自動淡出），手動操作享有絕對搶佔優先權。
 
 ### [SPEC-10: EQUIDISTANT_RADIAL_ARCHIPELAGO] 正七邊形極座標等距群島 (方案 A)
 - **圓心等距律**：外環 7 座島均佈於半徑 $R = 12.50$ 之圓形軌道，到中央 `dev-island` 距離 100% 絕對相等 ($12.500$)。
@@ -140,7 +141,7 @@ docker compose up -d
 ```powershell
 docker compose exec tester node --test tests/*.mjs
 ```
-**17 項量化斷言測試涵蓋**：
+**18 項量化斷言測試涵蓋**：
 1. `[PASS]` `[ISLAND_CORE_COUNT]` 精確包含 8 座核心島嶼。
 2. `[PASS]` `[DEV_ISLAND_SPEC]` 必含 `dev-island` 且欄位符合型別約束。
 3. `[PASS]` `[AXIAL_COORDINATE_COLLISION]` 8 座島嶼軸向座標 0 衝突重疊。
@@ -157,7 +158,8 @@ docker compose exec tester node --test tests/*.mjs
 14. `[PASS]` `[SEARCH_FILTER_PRECISION]` 全文檢索精準過濾匹配島嶼與條目。
 15. `[PASS]` `[QUOTES_DATA_INTEGRITY]` 金句庫包含至少 10 條人生信條與架構心法。
 16. `[PASS]` `[WANDERER_ENGINE_SOURCE_INTEGRITY]` 旅人引擎具備完整巡航、揮手與氣泡介面。
-17. `[PASS]` `[WANDERER_DOM_AND_STYLES_CONTRACT]` 宿主 DOM 與毛玻璃樣式契約完整。
+17. `[PASS]` `[WANDERER_AUTONOMOUS_ROAMING_CONTRACT]` 旅人自律計時器與自主漫遊出沒契約。
+18. `[PASS]` `[WANDERER_DOM_AND_STYLES_CONTRACT]` 宿主 DOM 與毛玻璃樣式契約完整。
 
 ---
 
