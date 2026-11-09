@@ -184,7 +184,7 @@ export const islands = [
     ]
   },
   {
-    id: "adventures-joy",
+    id: "adventure-joy",
     name: "探索與冒險之島",
     subtitle: "Adventures & Joy",
     biome: "Sunset Archipelago",

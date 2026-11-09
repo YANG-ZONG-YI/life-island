@@ -6,6 +6,7 @@ import * as THREE from 'three';
  */
 
 export const HEX_RADIUS = 3.6; // 六角形外接圓半徑
+export const EQUIDISTANT_RADIUS = 12.5; // 外環島嶼軌道半徑 (方案 A: 正七邊形等距)
 
 /**
  * 軸向座標轉世界笛卡爾座標 (q, r -> x, z)
@@ -17,6 +18,31 @@ export const HEX_RADIUS = 3.6; // 六角形外接圓半徑
 export function axialToCartesian(q, r, radius = HEX_RADIUS) {
   const x = radius * Math.sqrt(3) * (q + r / 2);
   const z = radius * 1.5 * r;
+  return { x, z };
+}
+
+/**
+ * 取得島嶼世界笛卡爾座標 (正七邊形極座標完美等距系統)
+ * dev-island 位於中央原點 (0, 0)，外環 7 座島嶼等角均佈於半徑 EQUIDISTANT_RADIUS 軌道
+ * @param {object} islandData
+ * @param {Array<object>} allIslands
+ * @returns {{x: number, z: number}}
+ */
+export function getEquidistantCoordinates(islandData, allIslands = []) {
+  if (islandData.id === 'dev-island') {
+    return { x: 0, z: 0 };
+  }
+
+  const outerIslands = allIslands.filter(i => i.id !== 'dev-island');
+  const index = outerIslands.findIndex(i => i.id === islandData.id);
+  const totalOuter = outerIslands.length || 7;
+  const safeIndex = index >= 0 ? index : 0;
+
+  // 正北起始 (-Math.PI / 2)，順時針均分 7 等分
+  const angle = -Math.PI / 2 + (safeIndex * 2 * Math.PI) / totalOuter;
+  const x = Number((EQUIDISTANT_RADIUS * Math.cos(angle)).toFixed(3));
+  const z = Number((EQUIDISTANT_RADIUS * Math.sin(angle)).toFixed(3));
+
   return { x, z };
 }
 
@@ -60,14 +86,18 @@ export function createHexPrismGeometry(radius, height, bevel = 0.25) {
 /**
  * 建立單一島嶼主柱體與邊框 Mesh
  * @param {object} islandData
+ * @param {Array<object>} allIslands
  * @returns {THREE.Group}
  */
-export function createIslandMesh(islandData) {
+export function createIslandMesh(islandData, allIslands = []) {
   const group = new THREE.Group();
   group.name = `island-${islandData.id}`;
   group.userData = { island: islandData };
 
-  const { x, z } = axialToCartesian(islandData.axialCoords.q, islandData.axialCoords.r);
+  const coords = (allIslands && allIslands.length > 0)
+    ? getEquidistantCoordinates(islandData, allIslands)
+    : axialToCartesian(islandData.axialCoords.q, islandData.axialCoords.r);
+
   const baseHeight = 1.6 * (islandData.height || 1.0);
 
   // 1. 六角柱基底網格
@@ -99,8 +129,8 @@ export function createIslandMesh(islandData) {
   rimMesh.position.y = baseHeight + 0.1;
   group.add(rimMesh);
 
-  // 3. 設定島嶼全局水平位置
-  group.position.set(x, 0, z);
+  // 3. 設定島嶼全局水平位置 (方案 A: 正七邊形等距極座標)
+  group.position.set(coords.x, 0, coords.z);
 
   return group;
 }

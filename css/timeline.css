@@ -120,14 +120,3 @@
   color: var(--primary);
 }
 
-/* 響應式佈局 */
-@media (max-width: 768px) {
-  #island-drawer {
-    width: 100vw;
-    right: -100vw;
-  }
-  .brand-title {
-    display: none;
-  }
-}
-

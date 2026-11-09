@@ -1,0 +1,148 @@
+/**
+ * Life Island 全平台現代化 RWD 響應式佈局 (Responsive Web Design SSOT)
+ * 涵蓋平板 (<= 768px) 與手機 (<= 480px) 觸控適配與 iOS 安全區規範
+ */
+
+/* ==========================================================================
+   平板與中型螢幕適配 (Tablet / Phablet: <= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* 1. 頂部 HUD 導覽列彈性收縮 */
+  #hud-nav {
+    top: max(12px, env(safe-area-inset-top, 12px));
+    left: 12px;
+    right: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .brand-badge {
+    padding: 7px 12px;
+  }
+
+  .brand-title {
+    display: none; /* 隱藏文字標題，保留 🏝️ 圖標省出空間 */
+  }
+
+  .nav-actions {
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .search-box-wrapper {
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 7px 28px 7px 30px;
+    font-size: 12px;
+  }
+
+  .search-input:focus {
+    width: 100%;
+  }
+
+  /* 搜尋下拉面板在平板與手機端滿版延伸 */
+  .search-dropdown {
+    position: fixed;
+    top: 68px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+    max-height: 60vh;
+  }
+
+  .nav-select, .nav-btn {
+    padding: 7px 11px;
+    font-size: 12px;
+  }
+
+  /* 2. 抽屜全屏適配與 iOS 安全區 */
+  #island-drawer {
+    width: 100vw;
+    right: -100vw;
+    box-shadow: none;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 16px);
+  }
+
+  .drawer-header-bar {
+    padding: 12px 16px 8px;
+  }
+
+  .close-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 20px;
+  }
+
+  #drawer-content {
+    padding: 0 16px 24px;
+  }
+
+  .island-title {
+    font-size: 21px;
+  }
+
+  /* 3. 懸浮提示卡適配 */
+  #hover-tooltip {
+    display: none; /* 移動觸控端停用 hover tooltip 避免畫面干擾 */
+  }
+}
+
+/* ==========================================================================
+   超緊湊手機螢幕適配 (Compact Mobile: <= 480px)
+   ========================================================================== */
+@media (max-width: 480px) {
+  #hud-nav {
+    gap: 6px;
+  }
+
+  .nav-actions {
+    width: 100%;
+    justify-content: space-between;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: none;
+  }
+
+  .nav-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  .search-box-wrapper {
+    order: -1;
+    width: 100%;
+    min-width: 100%;
+    margin-bottom: 4px;
+  }
+
+  .nav-select {
+    max-width: 130px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nav-btn {
+    flex-shrink: 0;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .policy-card, .milestone-card {
+    padding: 12px;
+  }
+
+  .wanderer-bubble {
+    max-width: 250px;
+    min-width: 180px;
+    padding: 10px 12px;
+  }
+
+  .bubble-text {
+    font-size: 12px;
+  }
+}
+

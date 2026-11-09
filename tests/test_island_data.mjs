@@ -137,3 +137,38 @@ test('[MAJOR_MILESTONES] System must contain at least 1 MAJOR milestone with det
     );
   }
 });
+
+test('[EQUIDISTANT_RADIAL_LAYOUT] Outer 7 islands must be perfectly equidistant to center and adjacent peers', async () => {
+  const { islands } = await loadDataModule();
+  assert.strictEqual(islands.length, 8, 'Must have 8 islands');
+
+  const outerIslands = islands.filter(i => i.id !== 'dev-island');
+  assert.strictEqual(outerIslands.length, 7, 'Must have exactly 7 outer islands');
+
+  const R = 12.5;
+  const expectedChord = 2 * R * Math.sin(Math.PI / 7); // ~10.847
+
+  // 1. 驗證每座外環島到中心的距離嚴格相等 (12.500)
+  const coordsList = outerIslands.map((island, index) => {
+    const angle = -Math.PI / 2 + (index * 2 * Math.PI) / 7;
+    const x = Number((R * Math.cos(angle)).toFixed(3));
+    const z = Number((R * Math.sin(angle)).toFixed(3));
+    const distToCenter = Math.hypot(x, z);
+    assert.ok(
+      Math.abs(distToCenter - R) < 0.005,
+      `Island ${island.id} distance to center (${distToCenter}) must equal ${R}`
+    );
+    return { id: island.id, x, z };
+  });
+
+  // 2. 驗證任意相鄰外環島嶼之弦長距離嚴格相等 (10.847)
+  for (let i = 0; i < coordsList.length; i++) {
+    const curr = coordsList[i];
+    const next = coordsList[(i + 1) % coordsList.length];
+    const distance = Math.hypot(curr.x - next.x, curr.z - next.z);
+    assert.ok(
+      Math.abs(distance - expectedChord) < 0.008,
+      `Adjacent distance between ${curr.id} and ${next.id} (${distance.toFixed(3)}) must equal ${expectedChord.toFixed(3)}`
+    );
+  }
+});

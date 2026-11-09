@@ -1,0 +1,73 @@
+/**
+ * Life Island 探險小旅人懸浮金句氣泡樣式 (Glassmorphism Mascot Bubble)
+ */
+
+.wanderer-bubble {
+  position: fixed;
+  display: none;
+  transform: translate(-50%, -100%) translateY(-18px);
+  z-index: 1200;
+  pointer-events: none;
+  max-width: 290px;
+  min-width: 190px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #f8fafc;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(251, 191, 36, 0.2);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  opacity: 0;
+}
+
+.wanderer-bubble.visible {
+  display: block;
+  opacity: 1;
+  pointer-events: auto;
+  animation: bubbleFloat 3s ease-in-out infinite alternate;
+}
+
+/* 底部小指針三角 */
+.wanderer-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 7px solid rgba(15, 23, 42, 0.88);
+}
+
+.bubble-header {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #fbbf24;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bubble-text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #e2e8f0;
+  font-style: italic;
+}
+
+@keyframes bubbleFloat {
+  0% {
+    transform: translate(-50%, -100%) translateY(-18px);
+  }
+  100% {
+    transform: translate(-50%, -100%) translateY(-23px);
+  }
+}
+

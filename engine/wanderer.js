@@ -152,16 +152,21 @@ export function createWandererController(scene) {
       }
     }
 
-    // 3. 氣泡投影位置跟隨
+    // 3. 氣泡投影位置跟隨與邊界安全鉗位 (Screen Clamping)
     if (bubbleEl && bubbleEl.classList.contains('visible') && camera) {
       const screenPos = rootGroup.position.clone();
       screenPos.y += 1.8;
       screenPos.project(camera);
 
-      const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
-      const y = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
-      bubbleEl.style.left = `${x}px`;
-      bubbleEl.style.top = `${y}px`;
+      const rawX = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
+      const rawY = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
+
+      // 邊界防禦：氣泡預留左右各 140px 半寬度與頂部 90px 高度
+      const clampedX = Math.max(140, Math.min(window.innerWidth - 140, rawX));
+      const clampedY = Math.max(90, Math.min(window.innerHeight - 60, rawY));
+
+      bubbleEl.style.left = `${clampedX}px`;
+      bubbleEl.style.top = `${clampedY}px`;
     }
   }
 

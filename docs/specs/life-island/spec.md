@@ -42,6 +42,17 @@
 
 幾何體沿 X 軸旋轉 `pi / 2` 弧度，使六角截面朝向天頂正上方 (Y 軸向上)。
 
+### 2.3 正七邊形極座標等距契約 (Radial Equidistant Archipelago)
+為解決離散整數座標在外環分佈不均勻之缺陷，系統採用正七邊形極座標等距算法定位世界座標：
+- **中央核心島 (`dev-island`)**：$(X_0, Z_0) = (0, 0)$。
+- **外環 7 大支柱島嶼**：
+  - 軌道半徑：`EQUIDISTANT_RADIUS = 12.50` 單位。
+  - 方位角：$\theta_i = -\frac{\pi}{2} + i \times \frac{2\pi}{7}$，其中 $i \in [0, 6]$（以正北方向為起點順時針均分）。
+  - 世界座標：$X_i = 12.5 \times \cos(\theta_i)$，$Z_i = 12.5 \times \sin(\theta_i)$。
+- **等距不變量約束**：
+  - 外環所有島嶼到中心距離 MUST 嚴格等於 $12.500 \pm 0.005$。
+  - 外環任意相鄰兩島間距 MUST 嚴格等於 $10.847 \pm 0.008$。
+
 ---
 
 ## 3. 8 大核心島嶼架構規範 (Eight Core Islands Specification)
@@ -129,6 +140,12 @@ interface DevLogEntity {
 - **[PROBE: STATIC_ASSETS]**：應用核心檔案 (`/app.js`、`/data.js`、`/dataLogs.js`、`/style.css`、`/engine/*.js`) 存取 MUST 回傳 `HTTP 200 OK`。
 - **[PROBE: CLIENT_RENDERING]**：零伺服器運算契約。三維網格計算、動態 Shader 渲染與射線拾取 100% 於客戶端瀏覽器執行。
 
+### 5.3 全平台 RWD 與直屏動態視野契約 (Responsive Web Design & Portrait Dynamics)
+- **[RWD: BREAKPOINTS]**：系統必須區分平板 (`max-width: 768px`) 與手機 (`max-width: 480px`) 斷點，集中宣告於 `css/responsive.css`。
+- **[RWD: SAFE_AREA]**：全屏抽屜與 HUD 導航列必須遵守 iOS 安全區契約 (`env(safe-area-inset-top)` / `env(safe-area-inset-bottom)`)。
+- **[RWD: PORTRAIT_CAMERA]**：當螢幕寬高比 `aspect < 1.0` 時，相機預設距離必須動態放大 ($1.0 \sim 1.85\times$)，保證 8 座群島全景於直屏手機完整可見無裁切。
+- **[RWD: SCREEN_CLAMPING]**：3D 氣泡投影至螢幕像素時，必須施加邊界安全鉗位（左右預留 $140\text{px}$、頂部預留 $90\text{px}$），杜絕邊界截斷。
+
 ---
 
 ## 6. 跨島協作光流線與 3D 聚光搜尋規範 (Synergy & Search Specification)
@@ -154,4 +171,24 @@ interface SynergyConnection {
 - 搜尋範圍涵蓋島嶼名稱、副標題、政策/里程碑標題與內文詳細步驟、以及開發日誌。
 - 檢索演算法回傳格式：`Array<{ islandId: string, islandName: string, matchedItems: Array<{ title: string, type: string }> }>`。
 - 響應時間 MUST < 50ms。
+
+---
+
+## 7. 微縮探險小旅人與心法金句規範 (The Wanderer Mascot & Wisdom Quotes Specification)
+
+### 7.1 幾何與材質契約 (Mascot Geometry & Shader)
+- 構造：純代碼程序化低多邊形組合體，包含軀幹 (`CylinderGeometry`)、頭部 (`SphereGeometry`)、卡其探險帽雙層組合、皮質背包與雙腿。
+- 右手臂掛載獨立旋轉樞軸 (`rightArmPivot`)，支援 `Z` 軸旋轉揮手打招呼動畫。
+- 標記屬性：小旅人所屬 Mesh 均標記 `userData.isWanderer = true` 與 `userData.isClickable = true`。
+
+### 7.2 動態位移與巡航動力學 (Trajectory & State Dynamics)
+- **閒置呼吸**：閒置狀態下軀幹於 Y 軸執行正弦週期微浮動 ($\pm 0.02$ 單位)。
+- **島嶼巡航**：當目標島嶼切換時，旅人面向目標點，依循拋物線軌跡 (`lerpVectors` + 拱起弧度 $4.2 \times \sin(\pi \times progress)$) 躍動巡航，耗時固定為 $1.1$ 秒。
+- **抵達反饋**：降落目標島頂面後，自動觸發 2 週期的揮手致意動畫。
+
+### 7.3 心法金句氣泡契約 (Wisdom Quotes Bubble)
+- 氣泡 DOM：以 `#wanderer-bubble` 為宿主容器，具備毛玻璃擬態 (`backdrop-filter: blur(14px)`) 與指向小指針。
+- 空間投影：三維世界座標即時映射至二維螢幕像素 ($x, y$)，跟隨相機旋轉與縮放。
+- 金句資料源：由 `dataQuotes.js` 隨機抽取，顯示時間為 5.5 秒後自動淡出。
+
 

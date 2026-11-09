@@ -26,7 +26,7 @@ const VALID_ISLAND_IDS = new Set([
   'vitality-health',
   'wealth-architecture',
   'deep-connections',
-  'adventures-joy'
+  'adventure-joy'
 ]);
 
 test('[SYNERGY_CONNECTIONS_EXIST] data.js must export synergyConnections with at least 6 cross-island connections', async () => {
