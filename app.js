@@ -118,6 +118,8 @@ class LifeIslandApp {
 
   initWanderer() {
     this.wanderer = createWandererController(this.scene);
+    this.wanderer.setIslandsMap(this.islandsMap);
+
     this.wanderer.group.traverse((child) => {
       if (child.isMesh) {
         child.userData.isWanderer = true;
@@ -128,7 +130,7 @@ class LifeIslandApp {
 
     const devIsland = this.islandsMap.get('dev-island');
     if (devIsland) {
-      this.wanderer.travelToIsland(devIsland.group.position);
+      this.wanderer.travelToIsland(devIsland.group.position, null, 'dev-island');
     }
   }
 
@@ -151,7 +153,7 @@ class LifeIslandApp {
     this.cameraController.flyTo(entry.group.position);
     this.spotlightController.focusIsland(islandId, this.islandsMap);
     if (this.wanderer) {
-      this.wanderer.travelToIsland(entry.group.position);
+      this.wanderer.travelToIsland(entry.group.position, null, islandId);
     }
     this.uiController.openDrawer(entry.data, keyword);
   }
@@ -162,7 +164,7 @@ class LifeIslandApp {
     if (this.wanderer) {
       const devIsland = this.islandsMap.get('dev-island');
       if (devIsland) {
-        this.wanderer.travelToIsland(devIsland.group.position);
+        this.wanderer.travelToIsland(devIsland.group.position, null, 'dev-island');
       }
     }
   }

@@ -78,7 +78,7 @@ test('[ISLAND_POLICIES_AND_ITEMS] Every island must have non-empty policies or m
   }
 });
 
-test('[DEV_LOGS_FORMAT] Dev logs must exist and each entry must have valid YYYY-MM-DD date', async () => {
+test('[DEV_LOGS_FORMAT] Dev logs must exist and each entry must have valid YYYY-MM-DD date and unique numeric ID', async () => {
   const mod = await loadDataModule();
   const devIsland = (mod.islands || []).find(i => i.id === 'dev-island');
   const logs = mod.devLogs || (devIsland && devIsland.devLogs);
@@ -87,8 +87,21 @@ test('[DEV_LOGS_FORMAT] Dev logs must exist and each entry must have valid YYYY-
   assert.ok(logs.length > 0, 'devLogs must contain at least 1 log entry');
 
   const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+  const idSet = new Set();
+
   for (const log of logs) {
-    assert.ok(log.date, `Log entry ${log.id || 'unknown'} must have a date field`);
+    assert.ok(log.id !== undefined && log.id !== null, 'Log entry must have an id field');
+    assert.ok(
+      typeof log.id === 'number' || (typeof log.id === 'string' && /^\d+$/.test(log.id)),
+      `Log id '${log.id}' must be represented as a number or numeric string`
+    );
+    assert.ok(
+      !idSet.has(log.id),
+      `Duplicate log id '${log.id}' detected! All devLogs must have strictly unique IDs`
+    );
+    idSet.add(log.id);
+
+    assert.ok(log.date, `Log entry ${log.id} must have a date field`);
     assert.match(
       log.date,
       datePattern,
@@ -96,7 +109,7 @@ test('[DEV_LOGS_FORMAT] Dev logs must exist and each entry must have valid YYYY-
     );
     assert.ok(
       Boolean(log.title || log.summary || log.content),
-      `Log entry ${log.id || 'unknown'} must have a descriptive title, summary, or content`
+      `Log entry ${log.id} must have a descriptive title, summary, or content`
     );
   }
 });

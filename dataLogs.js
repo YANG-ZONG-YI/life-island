@@ -4,7 +4,7 @@
 
 export const devLogs = [
   {
-    id: "log-2026-11-09",
+    id: 1,
     date: "2026-11-09",
     type: "MAJOR",
     title: "Life Island 3D 零框架純靜態系統正式立項與架構確立",
@@ -18,7 +18,7 @@ export const devLogs = [
     status: "COMPLETED"
   },
   {
-    id: "log-2026-11-09",
+    id: 2,
     date: "2026-11-09",
     type: "ARCHITECTURE",
     title: "低多邊形水波 Shader 動態流光與視角跟隨演算法",
@@ -31,8 +31,8 @@ export const devLogs = [
     status: "COMPLETED"
   },
   {
-    id: "log-2026-11-10",
-    date: "2026-11-10",
+    id: 3,
+    date: "2026-11-09",
     type: "MAJOR",
     title: "全平台現代化 RWD 響應式佈局與直屏 3D 相機自適應",
     summary: "打造 iOS/Android 手機與平板完美體驗，實裝直屏相機自適應視距與 iOS 安全區契約。",
@@ -46,8 +46,8 @@ export const devLogs = [
     status: "COMPLETED"
   },
   {
-    id: "log-2026-11-10",
-    date: "2026-11-10",
+    id: 4,
+    date: "2026-11-09",
     type: "ARCHITECTURE",
     title: "Cloudflare Pages 邊緣雲與 GitHub 雙軌零構建秒開交付",
     summary: "導入 Cloudflare Pages 與 wrangler 靜態邊緣網路，實現全球 CDN 毫秒級冷啟動。",
@@ -59,8 +59,8 @@ export const devLogs = [
     status: "COMPLETED"
   },
   {
-    id: "log-2026-11-10",
-    date: "2026-11-10",
+    id: 5,
+    date: "2026-11-09",
     type: "MAJOR",
     title: "正七邊形極座標完美等距群島幾何重構 (方案 A)",
     summary: "徹底消除六角整數網格導致的島嶼內凹與間距不均，實現中央開發島 + 外環 7 大支柱完美對稱。",
@@ -74,8 +74,23 @@ export const devLogs = [
     status: "COMPLETED"
   },
   {
-    id: "log-2026-11-10",
-    date: "2026-11-10",
+    id: 6,
+    date: "2026-11-09",
+    type: "MAJOR",
+    title: "探險小旅人自主隨機漫遊出沒模式 (方案 1)",
+    summary: "為微縮小旅人注入自主生命力，閒置時時不時在群島間躍動出沒並隨機分享心法。",
+    details: [
+      "建構閒置自主漫遊自律計時器 (14 ~ 22 秒隨機冷卻區間)",
+      "小旅人自主隨機挑選相異島嶼躍動巡航，落地觸發揮手致意",
+      "抵達目標島嶼後以 40% 機率自動冒出 Glassmorphism 心法氣泡 (4.5 秒自動淡出)",
+      "實裝使用者手動操作搶佔優先權防禦 (Preemption Guard)，杜絕操作衝突",
+      "新增 [WANDERER_AUTONOMOUS_ROAMING_CONTRACT] 自動化測試驗證"
+    ],
+    status: "COMPLETED"
+  },
+  {
+    id: 7,
+    date: "2026-11-09",
     type: "MAJOR",
     title: "跨維度協作光流線 (Synergy Lines) 與動態天氣著色器計畫",
     summary: "重大規劃：引入島嶼間能量協作動態流光，並加入日夜與降雨粒子模擬。",

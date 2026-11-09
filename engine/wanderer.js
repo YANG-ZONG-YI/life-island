@@ -69,13 +69,21 @@ export function createWandererController(scene) {
     }
   });
 
-  // 3. 動態位移與狀態
+  // 3. 動態位移與狀態機
   let isTraveling = false;
+  let isAutonomousRoam = false;
   let travelProgress = 0;
   const travelDuration = 1.1; // 秒
   const startPos = new THREE.Vector3(0, 2.2, 0);
   const targetPos = new THREE.Vector3(0, 2.2, 0);
   let onArrivedCallback = null;
+
+  let currentIslandId = 'dev-island';
+  let islandsMapRef = null;
+  let idleTimer = 0;
+  let nextRoamInterval = 14 + Math.random() * 8; // 閒置 14 ~ 22 秒自主漫遊
+  let lastCamera = null;
+  let quoteTimerId = null;
 
   rootGroup.position.copy(startPos);
 
@@ -85,14 +93,25 @@ export function createWandererController(scene) {
   // DOM 氣泡
   const bubbleEl = document.getElementById('wanderer-bubble');
 
-  function travelToIsland(destinationPos, onArrived) {
+  function setIslandsMap(map) {
+    islandsMapRef = map;
+  }
+
+  function travelToIsland(destinationPos, onArrived, islandId = null, isAutonomous = false) {
     startPos.copy(rootGroup.position);
     targetPos.copy(destinationPos);
     targetPos.y += 2.1; // 站在島嶼頂面
 
     isTraveling = true;
+    isAutonomousRoam = isAutonomous;
     travelProgress = 0;
     onArrivedCallback = onArrived;
+    if (islandId) currentIslandId = islandId;
+
+    // 重置閒置計時，避免連續重複觸發
+    idleTimer = 0;
+    nextRoamInterval = 14 + Math.random() * 8;
+
     hideQuoteBubble();
 
     // 朝向目標點
@@ -104,7 +123,7 @@ export function createWandererController(scene) {
     waveTime = 0;
   }
 
-  function showQuoteBubble(camera) {
+  function showQuoteBubble(camera, autoHideMs = 5500) {
     if (!bubbleEl) return;
     const quote = getRandomQuote();
     bubbleEl.innerHTML = `
@@ -114,14 +133,34 @@ export function createWandererController(scene) {
     bubbleEl.classList.add('visible');
     triggerGreeting();
 
-    setTimeout(() => hideQuoteBubble(), 5500);
+    if (quoteTimerId) clearTimeout(quoteTimerId);
+    quoteTimerId = setTimeout(() => hideQuoteBubble(), autoHideMs);
   }
 
   function hideQuoteBubble() {
+    if (quoteTimerId) {
+      clearTimeout(quoteTimerId);
+      quoteTimerId = null;
+    }
     if (bubbleEl) bubbleEl.classList.remove('visible');
   }
 
+  function triggerAutonomousRoam() {
+    if (!islandsMapRef || islandsMapRef.size <= 1 || isTraveling) return;
+
+    // 隨機選取非當前島嶼進行躍動探險
+    const candidateEntries = Array.from(islandsMapRef.values()).filter(
+      item => item.data && item.data.id !== currentIslandId
+    );
+
+    if (candidateEntries.length === 0) return;
+    const selected = candidateEntries[Math.floor(Math.random() * candidateEntries.length)];
+    travelToIsland(selected.group.position, null, selected.data.id, true);
+  }
+
   function update(delta, camera) {
+    lastCamera = camera;
+
     // 1. 拋物線彈跳位移
     if (isTraveling) {
       travelProgress += delta / travelDuration;
@@ -130,6 +169,12 @@ export function createWandererController(scene) {
         isTraveling = false;
         rootGroup.position.copy(targetPos);
         triggerGreeting();
+
+        // 自主漫遊抵達時有 40% 機率自動分享心法
+        if (isAutonomousRoam && Math.random() < 0.4) {
+          showQuoteBubble(camera, 4500);
+        }
+
         if (onArrivedCallback) onArrivedCallback();
       } else {
         rootGroup.position.lerpVectors(startPos, targetPos, travelProgress);
@@ -140,6 +185,17 @@ export function createWandererController(scene) {
     } else {
       // 閒置微呼吸
       torso.position.y = 0.52 + Math.sin(Date.now() * 0.003) * 0.02;
+
+      // 自主漫遊計時器檢查 (方案 1: 時不時自主躍動出沒)
+      const isBubbleActive = bubbleEl && bubbleEl.classList.contains('visible');
+      if (!isBubbleActive && islandsMapRef) {
+        idleTimer += delta;
+        if (idleTimer >= nextRoamInterval) {
+          idleTimer = 0;
+          nextRoamInterval = 14 + Math.random() * 8;
+          triggerAutonomousRoam();
+        }
+      }
     }
 
     // 2. 揮手動態
@@ -172,7 +228,9 @@ export function createWandererController(scene) {
 
   return {
     group: rootGroup,
+    setIslandsMap,
     travelToIsland,
+    triggerAutonomousRoam,
     triggerGreeting,
     showQuoteBubble,
     hideQuoteBubble,
