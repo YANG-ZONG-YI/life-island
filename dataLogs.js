@@ -62,6 +62,21 @@ export const devLogs = [
     id: "log-2026-11-10",
     date: "2026-11-10",
     type: "MAJOR",
+    title: "正七邊形極座標完美等距群島幾何重構 (方案 A)",
+    summary: "徹底消除六角整數網格導致的島嶼內凹與間距不均，實現中央開發島 + 外環 7 大支柱完美對稱。",
+    details: [
+      "實作 getEquidistantCoordinates 幾何演算法，外環 7 座島精確均佈於半徑 R=12.5 軌道",
+      "外環所有島嶼到中央 dev-island 距離 100% 絕對相等 (12.500)",
+      "任意相鄰外環兩島弦長間距 100% 絕對相等 (10.847)，無縫消除視覺擠壓與偏斜",
+      "跨島協作光流線 (Synergy Lines) 與小旅人巡航自動對齊新等距空間拓撲",
+      "新增 [EQUIDISTANT_RADIAL_LAYOUT] 自動化斷言測試，嚴格守護幾何不變量"
+    ],
+    status: "COMPLETED"
+  },
+  {
+    id: "log-2026-11-10",
+    date: "2026-11-10",
+    type: "MAJOR",
     title: "跨維度協作光流線 (Synergy Lines) 與動態天氣著色器計畫",
     summary: "重大規劃：引入島嶼間能量協作動態流光，並加入日夜與降雨粒子模擬。",
     details: [

@@ -70,6 +70,11 @@
 - **低多邊形程序化角色**：純代碼構建之探險小人偶，隨島嶼切換以拋物線軌跡（Arc Height = 4.2）躍動巡航。
 - **互動心法金句氣泡**：點擊小旅人彈出世界座標 3D 投影之 Glassmorphism 氣泡，實裝螢幕安全邊界鉗位 (Screen Clamping) 防禦。
 
+### [SPEC-10: EQUIDISTANT_RADIAL_ARCHIPELAGO] 正七邊形極座標等距群島 (方案 A)
+- **圓心等距律**：外環 7 座島均佈於半徑 $R = 12.50$ 之圓形軌道，到中央 `dev-island` 距離 100% 絕對相等 ($12.500$)。
+- **相鄰等距律**：外環 7 座島以正北為起點等角均分，任意相鄰兩島間距 100% 絕對相等 ($10.847$)，徹底消除離散六角整數座標之幾何偏斜與內凹。
+- **動態拓撲自適應**：跨島協作光流線 (Synergy Lines) 與小旅人巡航路徑自動對齊等距世界座標。
+
 ---
 
 ## 2. 系統目錄拓撲 (Project Topology)
@@ -135,23 +140,24 @@ docker compose up -d
 ```powershell
 docker compose exec tester node --test tests/*.mjs
 ```
-**16 項量化斷言測試涵蓋**：
+**17 項量化斷言測試涵蓋**：
 1. `[PASS]` `[ISLAND_CORE_COUNT]` 精確包含 8 座核心島嶼。
 2. `[PASS]` `[DEV_ISLAND_SPEC]` 必含 `dev-island` 且欄位符合型別約束。
 3. `[PASS]` `[AXIAL_COORDINATE_COLLISION]` 8 座島嶼軸向座標 0 衝突重疊。
 4. `[PASS]` `[ISLAND_POLICIES_AND_ITEMS]` 每座島嶼均具備非空政策或里程碑。
 5. `[PASS]` `[DEV_LOGS_FORMAT]` 開發日誌每筆日期嚴格符合 `YYYY-MM-DD` 正規表示式。
 6. `[PASS]` `[MAJOR_MILESTONES]` 包含至少 1 筆 `MAJOR` 重大規劃且附帶詳細子任務清單。
-7. `[PASS]` `[RWD_STYLES_CONTRACT]` `responsive.css` 集中宣告 768px/480px 斷點與 iOS 安全區。
-8. `[PASS]` `[RWD_SEPARATION_OF_CONCERNS]` `timeline.css` 完全無非本職 media query 污染。
-9. `[PASS]` `[CAMERA_PORTRAIT_ADAPTOR]` 相機模組具備長寬比直屏自適應視距算法。
-10. `[PASS]` `[WANDERER_SCREEN_CLAMPING]` 旅人氣泡具備螢幕邊界安全鉗位防禦。
-11. `[PASS]` `[SYNERGY_CONNECTIONS_EXIST]` 跨島協作線至少 6 條有效連線。
-12. `[PASS]` `[SYNERGY_ENDPOINTS_VALID]` 協作端點均為合法島嶼且無自環。
-13. `[PASS]` `[SEARCH_FILTER_PRECISION]` 全文檢索精準過濾匹配島嶼與條目。
-14. `[PASS]` `[QUOTES_DATA_INTEGRITY]` 金句庫包含至少 10 條人生信條與架構心法。
-15. `[PASS]` `[WANDERER_ENGINE_SOURCE_INTEGRITY]` 旅人引擎具備完整巡航、揮手與氣泡介面。
-16. `[PASS]` `[WANDERER_DOM_AND_STYLES_CONTRACT]` 宿主 DOM 與毛玻璃樣式契約完整。
+7. `[PASS]` `[EQUIDISTANT_RADIAL_LAYOUT]` 外環 7 座島圓心距離 (12.500) 與相鄰間距 (10.847) 100% 絕對等距。
+8. `[PASS]` `[RWD_STYLES_CONTRACT]` `responsive.css` 集中宣告 768px/480px 斷點與 iOS 安全區。
+9. `[PASS]` `[RWD_SEPARATION_OF_CONCERNS]` `timeline.css` 完全無非本職 media query 污染。
+10. `[PASS]` `[CAMERA_PORTRAIT_ADAPTOR]` 相機模組具備長寬比直屏自適應視距算法。
+11. `[PASS]` `[WANDERER_SCREEN_CLAMPING]` 旅人氣泡具備螢幕邊界安全鉗位防禦。
+12. `[PASS]` `[SYNERGY_CONNECTIONS_EXIST]` 跨島協作線至少 6 條有效連線。
+13. `[PASS]` `[SYNERGY_ENDPOINTS_VALID]` 協作端點均為合法島嶼且無自環。
+14. `[PASS]` `[SEARCH_FILTER_PRECISION]` 全文檢索精準過濾匹配島嶼與條目。
+15. `[PASS]` `[QUOTES_DATA_INTEGRITY]` 金句庫包含至少 10 條人生信條與架構心法。
+16. `[PASS]` `[WANDERER_ENGINE_SOURCE_INTEGRITY]` 旅人引擎具備完整巡航、揮手與氣泡介面。
+17. `[PASS]` `[WANDERER_DOM_AND_STYLES_CONTRACT]` 宿主 DOM 與毛玻璃樣式契約完整。
 
 ---
 

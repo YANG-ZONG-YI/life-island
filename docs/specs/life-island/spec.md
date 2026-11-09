@@ -42,6 +42,17 @@
 
 幾何體沿 X 軸旋轉 `pi / 2` 弧度，使六角截面朝向天頂正上方 (Y 軸向上)。
 
+### 2.3 正七邊形極座標等距契約 (Radial Equidistant Archipelago)
+為解決離散整數座標在外環分佈不均勻之缺陷，系統採用正七邊形極座標等距算法定位世界座標：
+- **中央核心島 (`dev-island`)**：$(X_0, Z_0) = (0, 0)$。
+- **外環 7 大支柱島嶼**：
+  - 軌道半徑：`EQUIDISTANT_RADIUS = 12.50` 單位。
+  - 方位角：$\theta_i = -\frac{\pi}{2} + i \times \frac{2\pi}{7}$，其中 $i \in [0, 6]$（以正北方向為起點順時針均分）。
+  - 世界座標：$X_i = 12.5 \times \cos(\theta_i)$，$Z_i = 12.5 \times \sin(\theta_i)$。
+- **等距不變量約束**：
+  - 外環所有島嶼到中心距離 MUST 嚴格等於 $12.500 \pm 0.005$。
+  - 外環任意相鄰兩島間距 MUST 嚴格等於 $10.847 \pm 0.008$。
+
 ---
 
 ## 3. 8 大核心島嶼架構規範 (Eight Core Islands Specification)

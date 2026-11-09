@@ -95,7 +95,7 @@ class LifeIslandApp {
     this.scene.add(this.islandsRoot);
 
     for (const islandData of islands) {
-      const islandGroup = createIslandMesh(islandData);
+      const islandGroup = createIslandMesh(islandData, islands);
       addIslandDecorations(islandGroup, islandData);
 
       this.islandsRoot.add(islandGroup);
