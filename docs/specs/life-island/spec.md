@@ -61,16 +61,16 @@
 
 ### 3.1 島嶼矩陣清單
 
-| 島嶼識別碼 (id) | 名稱 (name) | 軸向座標 (q, r) | 高度係數 (height) | 主題色調 (color) | 強調光暈 (accentColor) | 地標類型 (landmark) |
+| 島嶼識別碼 (id) | 名稱 (name) | 軸向座標 (q, r) | 高度係數 (height) | 主題色調 (color) | 強調光暈 (accentColor) | 五行與地標類型 (landmark) |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `dev-island` | 開發與演進之島 | `(0, 0)` | `1.20` | `0x0ea5e9` | `#38bdf8` | 科技通訊核心高塔 (Cyber Obelisk) |
-| `north-star` | 北極星之島 | `(0, -2)` | `1.50` | `0xf59e0b` | `#fbbf24` | 幾何水晶巨石陣 (Crystalline Monoliths) |
-| `craft-impact` | 事業與影響力之島 | `(2, -2)` | `1.30` | `0x3b82f6` | `#60a5fa` | 未來摩天大樓群 (Tech Tower Cluster) |
-| `wisdom-knowledge` | 心智與學習之島 | `(-2, 2)` | `1.40` | `0x8b5cf6` | `#a78bfa` | 環形星象天文臺 (Arcane Observatory) |
-| `vitality-health` | 生命力與健康之島 | `(0, 2)` | `1.10` | `0x10b981` | `#34d399` | 生命之樹自然林 (Sacred World Tree) |
-| `wealth-architecture` | 財富與資源之島 | `(2, 0)` | `1.25` | `0xd97706` | `#f59e0b` | 金色階梯金字塔 (Step Pyramid Vault) |
-| `deep-connections` | 深度連結之島 | `(-2, 0)` | `1.15` | `0xf43f5e` | `#fb7185` | 雙螺旋共振立柱 (Intertwined Spire) |
-| `adventure-joy` | 探索與冒險之島 | `(1, 1)` | `1.20` | `0xf97316` | `#fb923c` | 險峰營地與燈塔 (Mountain Peak) |
+| `dev-island` | 開發與演進之島 | `(0, 0)` | `1.20` | `0x0284c7` | `#38bdf8` | 水行 · 天然珊瑚環礁與神泉 (Tidal Atoll & Springs) |
+| `north-star` | 北極星之島 | `(0, -2)` | `1.50` | `0xf59e0b` | `#fde047` | 金行 · 晨曦白金石英晶簇 (Crystalline Cape) |
+| `craft-impact` | 事業與影響力之島 | `(2, -2)` | `1.30` | `0x2563eb` | `#60a5fa` | 土行 · 喀斯特擎天柱與石橋 (Karst Pinnacle & Arch) |
+| `wisdom-knowledge` | 心智與學習之島 | `(-2, 2)` | `1.40` | `0x8b5cf6` | `#c084fc` | 水木共生 · 深海天坑藍洞石窟 (Abyssal Blue Hole) |
+| `vitality-health` | 生命力與健康之島 | `(0, 2)` | `1.20` | `0x059669` | `#34d399` | 木行 · 遠古巨榕氣根神木 (Ancient Sacred Banyan) |
+| `wealth-architecture` | 財富與資源之島 | `(2, 0)` | `1.25` | `0xd97706` | `#fbbf24` | 金土相生 · 砂金階梯海蝕台地 (Stepped Ore Terraces) |
+| `deep-connections` | 深度連結之島 | `(-2, 0)` | `1.15` | `0xf43f5e` | `#fda4af` | 木水交融 · 雙生海蝕石門珊瑚 (Twin Sea Arches) |
+| `adventure-joy` | 探索與冒險之島 | `(1, 1)` | `1.25` | `0xea580c` | `#fb923c` | 火行 · 熔岩黑曜石海蝕火山 (Obsidian Lava Caldera) |
 
 ### 3.2 島嶼實體資料契約 (Island Entity Schema)
 
