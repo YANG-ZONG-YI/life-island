@@ -1,6 +1,6 @@
 /**
  * Life Island 核心資料事實來源 (SSOT)
- * 包含 8 大核心島嶼定義、跨島協作關係與搜尋導出
+ * 包含 8 大核心島嶼定義 (五行海島風大自然神工)、跨島協作關係與搜尋導出
  */
 
 export { devLogs } from './dataLogs.js';
@@ -11,11 +11,11 @@ export const islands = [
   {
     id: "dev-island",
     name: "開發與演進之島",
-    subtitle: "Dev & Evolution Island",
-    biome: "Cyber Technology / Digital Oasis",
-    color: 0x0ea5e9,
+    subtitle: "原初潮汐環礁 · 水行之源",
+    biome: "水行 · 蔚藍潮間帶環礁與原初神泉",
+    color: 0x0284c7,
     accentColor: "#38bdf8",
-    description: "系統架構核心、版本演進、程式碼攻堅與開源藍圖樞紐。",
+    description: "五行屬水。天然珊瑚環抱的潮間帶聖泉，象徵系統底層源源不絕的演進動力與程式碼開源汪洋。",
     axialCoords: { q: 0, r: 0 },
     height: 1.2,
     items: [
@@ -36,11 +36,11 @@ export const islands = [
   {
     id: "north-star",
     name: "北極星之島",
-    subtitle: "North Star & Vision",
-    biome: "Solar Zenith / Golden Spire",
+    subtitle: "晨曦晶錐海岬 · 金行之魄",
+    biome: "金行 · 銳利石英晶岩與白金沙灘",
     color: 0xf59e0b,
-    accentColor: "#fbbf24",
-    description: "人生核心願景、非妥協原則與指引一切決策的終極羅盤。",
+    accentColor: "#fde047",
+    description: "五行屬金。經歷萬年海浪沖刷露出的天然白金晶柱天峰，金光四射，為整片海域指引不滅的願景航向。",
     axialCoords: { q: 0, r: -2 },
     height: 1.5,
     items: [
@@ -61,11 +61,11 @@ export const islands = [
   {
     id: "craft-impact",
     name: "事業與影響力之島",
-    subtitle: "Craft & Impact",
-    biome: "High-Tech Citadel",
-    color: 0x3b82f6,
+    subtitle: "喀斯特擎天海柱 · 土行之盤",
+    biome: "土行 · 鬼斧神工海上石林與天生石橋",
+    color: 0x2563eb,
     accentColor: "#60a5fa",
-    description: "技術工藝極致、旗艦軟體工程專案與跨界影響力矩陣。",
+    description: "五行屬土。屹立於怒濤中的喀斯特垂直巨石群與天生海蝕拱橋，厚重沉穩，彰顯堅不可摧的工程工藝實力。",
     axialCoords: { q: 2, r: -2 },
     height: 1.3,
     items: [
@@ -86,11 +86,11 @@ export const islands = [
   {
     id: "wisdom-knowledge",
     name: "心智與學習之島",
-    subtitle: "Wisdom & Knowledge",
-    biome: "Arcane Observatory",
+    subtitle: "深海藍洞秘境 · 水木共生",
+    biome: "水木共生 · 潮汐海蝕石窟與靈泉幽林",
     color: 0x8b5cf6,
-    accentColor: "#a78bfa",
-    description: "心智模型演化、深度閱讀矩陣與跨學科知識網路。",
+    accentColor: "#c084fc",
+    description: "五行兼蓄水木。深邃通往地心的天然海中天坑與洞穴湧泉，宛如大自然的沉思之眼，凝聚無盡心智智慧。",
     axialCoords: { q: -2, r: 2 },
     height: 1.4,
     items: [
@@ -111,13 +111,13 @@ export const islands = [
   {
     id: "vitality-health",
     name: "生命力與健康之島",
-    subtitle: "Vitality & Body",
-    biome: "Emerald Forest & Springs",
-    color: 0x10b981,
+    subtitle: "遠古神榕雨林 · 木行之冠",
+    biome: "木行 · 潮汐氣根巨木與熱帶蕨類繁森",
+    color: 0x059669,
     accentColor: "#34d399",
-    description: "體能高峰鍛鍊、精準睡眠科學與生體機能長壽工程。",
+    description: "五行屬木。數百年氣根垂入海浪中的天然神榕海島，藤蔓交織、生機盎然，滋養身心極致的生命能量。",
     axialCoords: { q: 0, r: 2 },
-    height: 1.1,
+    height: 1.2,
     items: [
       {
         id: "vit-1",
@@ -136,11 +136,11 @@ export const islands = [
   {
     id: "wealth-architecture",
     name: "財富與資源之島",
-    subtitle: "Wealth Architecture",
-    biome: "Warm Copper Vault",
+    subtitle: "砂金層岩海台 · 金土相生",
+    biome: "金土相生 · 階梯海蝕台地與天然金礦結晶",
     color: 0xd97706,
-    accentColor: "#f59e0b",
-    description: "全球資產配置、防禦性現金護城河與非對稱被動收益。",
+    accentColor: "#fbbf24",
+    description: "五行屬金土。海浪長年切削形成的天然層階海台，石縫中蘊藏天然金砂與礦脈，構築堅如磐石的防禦護城河。",
     axialCoords: { q: 2, r: 0 },
     height: 1.25,
     items: [
@@ -161,11 +161,11 @@ export const islands = [
   {
     id: "deep-connections",
     name: "深度連結之島",
-    subtitle: "Deep Connections",
-    biome: "Coral Sanctuary",
+    subtitle: "雙生共生海蝕門 · 木水交融",
+    biome: "木水交融 · 雙生海蝕石門與紅樹林潟湖",
     color: 0xf43f5e,
-    accentColor: "#fb7185",
-    description: "家庭摯愛、心靈共振盟友社群與利他貢獻之泉。",
+    accentColor: "#fda4af",
+    description: "五行融合水木。兩座天然海蝕石柱在頂部合抱成門，紅樹林與珊瑚群在此共生，象徵靈魂深處的緊密羈絆與利他共鳴。",
     axialCoords: { q: -2, r: 0 },
     height: 1.15,
     items: [
@@ -186,13 +186,13 @@ export const islands = [
   {
     id: "adventure-joy",
     name: "探索與冒險之島",
-    subtitle: "Adventures & Joy",
-    biome: "Sunset Archipelago",
-    color: 0xf97316,
+    subtitle: "熔岩玄武海蝕火山 · 火行之極",
+    biome: "火行 · 赤焰熔岩天坑與黑曜石海蝕柱",
+    color: 0xea580c,
     accentColor: "#fb923c",
-    description: "世界旅行足跡、極限戶外探索與保持赤子之心的心流實驗。",
+    description: "五行屬火。地底熔岩湧出形成的黑曜石火山錐與熾熱硫磺湖，蒸汽蒸騰、海浪拍擊，激發永不熄滅的探索熱情。",
     axialCoords: { q: 1, r: 1 },
-    height: 1.2,
+    height: 1.25,
     items: [
       {
         id: "adv-1",
