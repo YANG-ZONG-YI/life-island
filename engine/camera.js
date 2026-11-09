@@ -22,27 +22,57 @@ export function createCameraController(camera, domElement) {
   const lerpSpeed = 0.06;
 
   /**
+   * 計算直向螢幕自適應視距
+   * @param {number} aspect 視窗寬高比
+   * @returns {THREE.Vector3}
+   */
+  function getResponsiveDefaultPosition(aspect = 1.0) {
+    if (aspect < 1.0) {
+      const factor = Math.min(1.85, Math.max(1.0, 0.95 / Math.max(0.45, aspect)));
+      return new THREE.Vector3(0, 18 * factor, 24 * factor);
+    }
+    return defaultPosition.clone();
+  }
+
+  /**
    * 平滑運鏡飛行至指定世界座標
    * @param {THREE.Vector3|{x: number, y: number, z: number}} destination
    * @param {number} distance 相機與目標的距離偏移量
    */
   function flyTo(destination, distance = 8.5) {
+    const aspect = camera.aspect || (window.innerWidth / window.innerHeight);
+    const aspectFactor = aspect < 1.0 ? Math.min(1.35, 0.9 / Math.max(0.5, aspect)) : 1.0;
+    const finalDist = distance * aspectFactor;
+
     flightTargetLookAt.set(destination.x, destination.y || 1.0, destination.z);
     flightTargetPos.set(
       destination.x,
-      destination.y + distance * 0.75,
-      destination.z + distance
+      destination.y + finalDist * 0.75,
+      destination.z + finalDist
     );
     isFlying = true;
   }
 
   /**
-   * 重置回全局島嶼群俯瞰視角
+   * 重置回全局島嶼群俯瞰視角 (自適應直向/橫向長寬比)
+   * @param {number} aspect
    */
-  function reset() {
+  function reset(aspect = camera.aspect) {
+    const targetPos = getResponsiveDefaultPosition(aspect || (window.innerWidth / window.innerHeight));
     flightTargetLookAt.copy(defaultTarget);
-    flightTargetPos.copy(defaultPosition);
+    flightTargetPos.copy(targetPos);
     isFlying = true;
+  }
+
+  /**
+   * 響應視窗尺寸與長寬比變更
+   * @param {number} aspect
+   */
+  function onWindowResize(aspect) {
+    if (!isFlying && camera.position.distanceTo(defaultPosition) < 15) {
+      const targetPos = getResponsiveDefaultPosition(aspect);
+      camera.position.lerp(targetPos, 0.15);
+    }
   }
 
   /**
@@ -71,6 +101,8 @@ export function createCameraController(camera, domElement) {
     flyTo,
     reset,
     update,
+    onWindowResize,
+    getResponsiveDefaultPosition,
     defaultPosition,
     defaultTarget
   };

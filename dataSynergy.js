@@ -27,7 +27,7 @@ export const synergyConnections = [
   },
   {
     from: 'vitality-health',
-    to: 'adventures-joy',
+    to: 'adventure-joy',
     label: '巔峰體能支撐極限探索',
     strength: 0.95,
     color: '#34d399'

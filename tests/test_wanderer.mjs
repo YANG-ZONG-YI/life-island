@@ -29,3 +29,16 @@ test('[WANDERER_ENGINE_SOURCE_INTEGRITY] engine/wanderer.js source code must dec
   assert.ok(code.includes('hideQuoteBubble'), 'Must declare hideQuoteBubble');
   assert.ok(code.includes('update'), 'Must declare update');
 });
+
+test('[WANDERER_DOM_AND_STYLES_CONTRACT] index.html and style.css must declare wanderer bubble element and styles', () => {
+  const html = fs.readFileSync('./index.html', 'utf-8');
+  assert.ok(html.includes('id="wanderer-bubble"'), 'index.html must contain #wanderer-bubble');
+
+  const css = fs.readFileSync('./style.css', 'utf-8');
+  assert.ok(css.includes('wanderer.css'), 'style.css must import wanderer.css');
+
+  const wandererCss = fs.readFileSync('./css/wanderer.css', 'utf-8');
+  assert.ok(wandererCss.includes('.wanderer-bubble'), 'css/wanderer.css must style .wanderer-bubble');
+  assert.ok(wandererCss.includes('bubble-header'), 'css/wanderer.css must style .bubble-header');
+});
+

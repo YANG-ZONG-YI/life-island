@@ -7,6 +7,7 @@ import { createCameraController } from './engine/camera.js';
 import { createUIController } from './engine/ui.js';
 import { createSynergyLines } from './engine/synergyLines.js';
 import { createSpotlightController } from './engine/spotlight.js';
+import { createWandererController } from './engine/wanderer.js';
 
 /**
  * Life Island 3D 主程序入口
@@ -27,6 +28,7 @@ class LifeIslandApp {
     this.initWater();
     this.initIslands();
     this.initSynergyAndSpotlight();
+    this.initWanderer();
     this.initCameraAndUI();
     this.initEvents();
 
@@ -46,8 +48,12 @@ class LifeIslandApp {
     this.scene.background = new THREE.Color(0x0f172a);
     this.scene.fog = new THREE.FogExp2(0x0f172a, 0.016);
 
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200);
-    this.camera.position.set(0, 18, 24);
+    const aspect = window.innerWidth / window.innerHeight;
+    this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 200);
+
+    // 直向螢幕 (Portrait: aspect < 1.0) 初始相機自動拉開視距，確保 8 座群島全景可見
+    const aspectFactor = aspect < 1.0 ? Math.min(1.85, 0.95 / Math.max(0.45, aspect)) : 1.0;
+    this.camera.position.set(0, 18 * aspectFactor, 24 * aspectFactor);
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
@@ -110,6 +116,22 @@ class LifeIslandApp {
     this.spotlightController = createSpotlightController(this.scene);
   }
 
+  initWanderer() {
+    this.wanderer = createWandererController(this.scene);
+    this.wanderer.group.traverse((child) => {
+      if (child.isMesh) {
+        child.userData.isWanderer = true;
+        child.userData.isClickable = true;
+        this.clickableMeshes.push(child);
+      }
+    });
+
+    const devIsland = this.islandsMap.get('dev-island');
+    if (devIsland) {
+      this.wanderer.travelToIsland(devIsland.group.position);
+    }
+  }
+
   initCameraAndUI() {
     this.cameraController = createCameraController(this.camera, this.renderer.domElement);
     this.uiController = createUIController({
@@ -128,12 +150,21 @@ class LifeIslandApp {
 
     this.cameraController.flyTo(entry.group.position);
     this.spotlightController.focusIsland(islandId, this.islandsMap);
+    if (this.wanderer) {
+      this.wanderer.travelToIsland(entry.group.position);
+    }
     this.uiController.openDrawer(entry.data, keyword);
   }
 
   handleResetView() {
     this.spotlightController.clearFocus(this.islandsMap);
     this.cameraController.reset();
+    if (this.wanderer) {
+      const devIsland = this.islandsMap.get('dev-island');
+      if (devIsland) {
+        this.wanderer.travelToIsland(devIsland.group.position);
+      }
+    }
   }
 
   applyTheme(isNight) {
@@ -148,9 +179,13 @@ class LifeIslandApp {
 
   initEvents() {
     window.addEventListener('resize', () => {
-      this.camera.aspect = window.innerWidth / window.innerHeight;
+      const aspect = window.innerWidth / window.innerHeight;
+      this.camera.aspect = aspect;
       this.camera.updateProjectionMatrix();
       this.renderer.setSize(window.innerWidth, window.innerHeight);
+      if (this.cameraController) {
+        this.cameraController.onWindowResize(aspect);
+      }
     });
 
     window.addEventListener('pointermove', (e) => {
@@ -160,16 +195,29 @@ class LifeIslandApp {
     });
 
     window.addEventListener('click', (e) => {
-      if (e.target.closest('#island-drawer') || e.target.closest('#hud-nav')) return;
+      if (e.target.closest('#island-drawer') || e.target.closest('#hud-nav') || e.target.closest('#wanderer-bubble')) return;
       this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
       this.handlePointerClick();
     });
 
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    window.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches[0]) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
     window.addEventListener('touchend', (e) => {
-      if (e.target.closest('#island-drawer') || e.target.closest('#hud-nav')) return;
+      if (e.target.closest('#island-drawer') || e.target.closest('#hud-nav') || e.target.closest('#wanderer-bubble')) return;
       if (e.changedTouches && e.changedTouches[0]) {
         const touch = e.changedTouches[0];
+        const moveDist = Math.hypot(touch.clientX - touchStartX, touch.clientY - touchStartY);
+        if (moveDist > 10) return; // 判定為旋轉/拖曳視角，防誤觸
+
         this.mouse.x = (touch.clientX / window.innerWidth) * 2 - 1;
         this.mouse.y = -(touch.clientY / window.innerHeight) * 2 + 1;
         this.handlePointerClick();
@@ -194,6 +242,8 @@ class LifeIslandApp {
         this.uiController.updateTooltip(entry.data, clientX, clientY);
       } else if (entry) {
         this.uiController.updateTooltip(entry.data, clientX, clientY);
+      } else if (hitMesh.userData.isWanderer) {
+        document.body.style.cursor = 'pointer';
       }
     } else {
       if (this.hoveredIslandGroup) this.resetHoverState();
@@ -212,7 +262,16 @@ class LifeIslandApp {
   handlePointerClick() {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const hits = this.raycaster.intersectObjects(this.clickableMeshes);
-    if (hits.length > 0) this.focusIslandById(hits[0].object.userData.islandId);
+    if (hits.length > 0) {
+      const hitObj = hits[0].object;
+      if (hitObj.userData.isWanderer && this.wanderer) {
+        this.wanderer.showQuoteBubble(this.camera);
+        return;
+      }
+      if (hitObj.userData.islandId) {
+        this.focusIslandById(hitObj.userData.islandId);
+      }
+    }
   }
 
   animate() {
@@ -223,6 +282,7 @@ class LifeIslandApp {
     if (this.water) this.water.update(elapsedTime);
     if (this.synergyLines) this.synergyLines.update(delta);
     if (this.spotlightController) this.spotlightController.update(delta);
+    if (this.wanderer) this.wanderer.update(delta, this.camera);
     if (this.cameraController) this.cameraController.update();
 
     this.renderer.render(this.scene, this.camera);
