@@ -50,7 +50,6 @@ export function createSynergyLines(scene, islandsMap, connections) {
     const points = curve.getPoints(60);
 
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
-    geometry.computeLineDistances();
 
     const lineColor = new THREE.Color(conn.color || 0x38bdf8);
 
@@ -64,6 +63,7 @@ export function createSynergyLines(scene, islandsMap, connections) {
     });
 
     const lineMesh = new THREE.Line(geometry, material);
+    lineMesh.computeLineDistances();
     group.add(lineMesh);
 
     // 沿著貝茲曲線流動的能量發光粒子
